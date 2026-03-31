@@ -36,6 +36,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="coin"
+        options={{
+          title: "硬币",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="circle.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="history"
         options={{
           title: "历史",
