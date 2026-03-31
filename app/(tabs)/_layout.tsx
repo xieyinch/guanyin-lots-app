@@ -37,6 +37,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="coin"
+<<<<<<< Updated upstream
         options={{
           title: "硬币",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="circle.fill" color={color} />,
@@ -44,9 +45,18 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="history"
+=======
+>>>>>>> Stashed changes
         options={{
-          title: "历史",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.fill" color={color} />,
+          title: "硬币",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="circle.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="bagua"
+        options={{
+          title: "八卦",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chevron.right" color={color} />,
         }}
       />
       <Tabs.Screen
