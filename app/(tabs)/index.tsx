@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, Animated, ScrollView, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { DivinationTabs, DivinationType } from '@/components/divination-tabs';
+import { DailyLotCard } from '@/components/daily-lot-card';
 import { useLots } from '@/hooks/use-lots';
 import { useCoinFlip } from '@/hooks/use-coin-flip';
 import { useBagua } from '@/hooks/use-bagua';
+import { useDailyLot } from '@/hooks/use-daily-lot';
 import { useColors } from '@/hooks/use-colors';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
@@ -14,6 +16,7 @@ export default function HomeScreen() {
   const { getRandomLot } = useLots();
   const { flipCoin } = useCoinFlip();
   const { getRandomBagua } = useBagua();
+  const { dailyLot, checkedIn, streak, checkIn, isLoading: dailyLoading } = useDailyLot();
 
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
@@ -269,43 +272,56 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScreenContainer className="p-4">
-      <View className="flex-1 gap-4">
-        {/* Title */}
-        <View className="gap-1 mb-2">
-          <Text className="text-3xl font-bold text-foreground">观音灵签</Text>
-          <Text className="text-sm text-muted">选择占卜方式</Text>
+    <ScreenContainer className="p-0">
+      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+        <View className="px-4 pt-4 pb-4 gap-4">
+          {/* Title */}
+          <View className="gap-1">
+            <Text className="text-3xl font-bold text-foreground">观音灵签</Text>
+            <Text className="text-sm text-muted">选择占卜方式</Text>
+          </View>
+
+          {/* Daily Lot Card */}
+          {dailyLot && (
+            <DailyLotCard
+              lot={dailyLot}
+              checkedIn={checkedIn}
+              streak={streak}
+              onCheckIn={checkIn}
+              isLoading={dailyLoading}
+            />
+          )}
+
+          {/* Divination Type Tabs */}
+          <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* Content Area */}
+          <View className="min-h-96">
+            {activeTab === 'lots' && renderLotsContent()}
+            {activeTab === 'coin' && renderCoinContent()}
+            {activeTab === 'bagua' && renderBaguaContent()}
+          </View>
+
+          {/* Draw Button */}
+          <Pressable
+            onPress={handleDraw}
+            disabled={isDrawing}
+            style={({ pressed }) => [
+              {
+                backgroundColor: colors.primary,
+                paddingVertical: 14,
+                paddingHorizontal: 16,
+                borderRadius: 8,
+                opacity: pressed || isDrawing ? 0.8 : 1,
+              },
+            ]}
+          >
+            <Text className="text-center font-semibold text-white text-base">
+              {isDrawing ? '占卜中...' : '开始占卜'}
+            </Text>
+          </Pressable>
         </View>
-
-        {/* Divination Type Tabs */}
-        <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-        {/* Content Area */}
-        <View className="flex-1">
-          {activeTab === 'lots' && renderLotsContent()}
-          {activeTab === 'coin' && renderCoinContent()}
-          {activeTab === 'bagua' && renderBaguaContent()}
-        </View>
-
-        {/* Draw Button */}
-        <Pressable
-          onPress={handleDraw}
-          disabled={isDrawing}
-          style={({ pressed }) => [
-            {
-              backgroundColor: colors.primary,
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-              borderRadius: 8,
-              opacity: pressed || isDrawing ? 0.8 : 1,
-            },
-          ]}
-        >
-          <Text className="text-center font-semibold text-white text-base">
-            {isDrawing ? '占卜中...' : '开始占卜'}
-          </Text>
-        </Pressable>
-      </View>
+      </ScrollView>
     </ScreenContainer>
   );
 }
