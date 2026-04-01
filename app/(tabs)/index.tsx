@@ -1,46 +1,44 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, Animated, ScrollView, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
-import { useLots, Lot } from '@/hooks/use-lots';
-import { useHistory } from '@/hooks/use-history';
+import { DivinationTabs, DivinationType } from '@/components/divination-tabs';
+import { useLots } from '@/hooks/use-lots';
+import { useCoinFlip } from '@/hooks/use-coin-flip';
+import { useBagua } from '@/hooks/use-bagua';
 import { useColors } from '@/hooks/use-colors';
-import { LotCard } from '@/components/lot-card';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
-import * as Sharing from 'expo-sharing';
-import { useFavorites } from '@/hooks/use-favorites';
 
 export default function HomeScreen() {
   const colors = useColors();
-  const { lots, isLoading: lotsLoading, getRandomLot } = useLots();
-  const { addRecord } = useHistory();
-  const { isFavorited, toggleFavorite } = useFavorites();
-  
-  const [currentLot, setCurrentLot] = useState<Lot | null>(null);
+  const { getRandomLot } = useLots();
+  const { flipCoin } = useCoinFlip();
+  const { getRandomBagua } = useBagua();
+
+  const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
   const [spinValue] = useState(new Animated.Value(0));
 
-  // Initialize with a random lot on first load
-  useEffect(() => {
-    if (!lotsLoading && lots.length > 0 && !currentLot) {
-      const randomLot = getRandomLot();
-      if (randomLot) {
-        setCurrentLot(randomLot);
-      }
-    }
-  }, [lotsLoading, lots]);
+  // Lots state
+  const [currentLot, setCurrentLot] = useState<any>(null);
+
+  // Coin state
+  const [coinResult, setCoinResult] = useState<'heads' | 'tails' | null>(null);
+
+  // Bagua state
+  const [currentBagua, setCurrentBagua] = useState<any>(null);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '720deg'],
+  });
 
   const handleDraw = async () => {
     if (isDrawing) return;
 
     setIsDrawing(true);
-    setShowDetail(false);
-
-    // Haptic feedback
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    // Spin animation
     spinValue.setValue(0);
     Animated.timing(spinValue, {
       toValue: 1,
@@ -48,137 +46,246 @@ export default function HomeScreen() {
       useNativeDriver: true,
     }).start();
 
-    // Simulate drawing delay
     setTimeout(async () => {
-      const newLot = getRandomLot();
-      if (newLot) {
-        setCurrentLot(newLot);
-        await addRecord(newLot);
-        
-        // Success haptic
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setShowDetail(true);
+      if (activeTab === 'lots') {
+        const lot = await getRandomLot();
+        setCurrentLot(lot);
+      } else if (activeTab === 'coin') {
+        const result = await flipCoin();
+        setCoinResult(result);
+      } else if (activeTab === 'bagua') {
+        const bagua = await getRandomBagua();
+        setCurrentBagua(bagua);
       }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setIsDrawing(false);
     }, 1500);
   };
 
-  const handleFavoritePress = async () => {
-    if (currentLot) {
-      await toggleFavorite(currentLot.id);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  };
-
-  const handleSharePress = async () => {
-    if (currentLot) {
-      try {
-        const message = `观音灵签 - 第${currentLot.id}签 ${currentLot.name}\n\n签诗：\n${currentLot.poem}\n\n诗意：${currentLot.meaning}`;
-        const uri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(message);
-        await Sharing.shareAsync(uri, {
-          mimeType: 'text/plain',
-          UTI: 'public.plain-text',
-        });
-      } catch (error) {
-        console.error('Share failed:', error);
-      }
-    }
-  };
-
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  if (lotsLoading) {
-    return (
-      <ScreenContainer className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text className="mt-4 text-muted">加载中...</Text>
-      </ScreenContainer>
-    );
-  }
-
-  if (showDetail && currentLot) {
-    return (
-      <ScreenContainer className="bg-background">
-        <View className="flex-1">
-          <LotCard
-            lot={currentLot}
-            isFavorited={isFavorited(currentLot.id)}
-            onFavoritePress={handleFavoritePress}
-            onSharePress={handleSharePress}
-          />
-          <Pressable
-            onPress={() => setShowDetail(false)}
-            style={({ pressed }) => [
-              {
-                backgroundColor: colors.primary,
-                paddingVertical: 12,
-                paddingHorizontal: 16,
-                borderRadius: 8,
-                marginHorizontal: 16,
-                marginBottom: 16,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-          >
-            <Text className="text-center font-semibold text-white">
-              返回
-            </Text>
-          </Pressable>
-        </View>
-      </ScreenContainer>
-    );
-  }
-
-  return (
-    <ScreenContainer className="items-center justify-center p-6">
-      <View className="gap-8 items-center flex-1 justify-center">
-        {/* Title */}
-        <View className="items-center gap-2">
-          <Text className="text-4xl font-bold text-foreground">
-            观音灵签
-          </Text>
-          <Text className="text-base text-muted">
-            点击下方按钮开始抽签
-          </Text>
-        </View>
-
-        {/* Current Lot Preview */}
-        {currentLot && (
-          <View
-            className="w-full rounded-2xl p-6 gap-4"
-            style={{ backgroundColor: colors.surface }}
-          >
-            <View className="items-center gap-2">
-              <Text className="text-sm font-semibold text-muted">
-                上次抽签
-              </Text>
-              <Text className="text-3xl font-bold text-foreground">
-                {currentLot.name}
-              </Text>
-              <View
-                className="px-4 py-2 rounded-full"
-                style={{
-                  backgroundColor:
-                    currentLot.grade === '上签'
-                      ? colors.success
-                      : currentLot.grade === '中签'
-                      ? colors.warning
-                      : colors.error,
-                }}
-              >
-                <Text className="text-sm font-bold text-white">
-                  {currentLot.grade}
-                </Text>
+  const renderLotsContent = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="gap-4 pb-6">
+        {currentLot ? (
+          <>
+            {/* Lot Number and Name */}
+            <View
+              className="rounded-2xl p-6 gap-3"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <View className="flex-row justify-between items-center">
+                <View>
+                  <Text className="text-sm text-muted">第 {currentLot.id} 签</Text>
+                  <Text className="text-2xl font-bold text-foreground">
+                    {currentLot.name}
+                  </Text>
+                </View>
+                <View
+                  className="px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor:
+                      currentLot.grade === '上签'
+                        ? colors.success
+                        : currentLot.grade === '中签'
+                        ? colors.warning
+                        : colors.error,
+                  }}
+                >
+                  <Text className="text-xs font-semibold text-white">
+                    {currentLot.grade}
+                  </Text>
+                </View>
               </View>
             </View>
-            <Text className="text-sm text-foreground text-center leading-relaxed">
-              {currentLot.poem}
-            </Text>
+
+            {/* Lot Poem */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">签诗</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentLot.poem}
+              </Text>
+            </View>
+
+            {/* Lot Interpretation */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">解曰</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentLot.interpretation}
+              </Text>
+            </View>
+
+            {/* Lot Details */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">详解</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentLot.details}
+              </Text>
+            </View>
+
+            {/* Lot Story */}
+            {currentLot.story && (
+              <View
+                className="rounded-lg p-4 gap-2"
+                style={{ backgroundColor: colors.surface }}
+              >
+                <Text className="text-xs font-semibold text-muted uppercase">典故</Text>
+                <Text className="text-sm leading-relaxed text-foreground">
+                  {currentLot.story}
+                </Text>
+              </View>
+            )}
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-muted text-center">点击下方按钮抽签</Text>
           </View>
         )}
+      </View>
+    </ScrollView>
+  );
+
+  const renderCoinContent = () => (
+    <View className="flex-1 items-center justify-center gap-6">
+      <View
+        className="w-32 h-32 rounded-full items-center justify-center"
+        style={{ backgroundColor: colors.surface }}
+      >
+        <Animated.View
+          style={{
+            transform: [{ rotateY: isDrawing ? spin : '0deg' }],
+          }}
+        >
+          <View
+            className="w-32 h-32 rounded-full items-center justify-center"
+            style={{
+              backgroundColor:
+                coinResult === 'heads'
+                  ? colors.primary
+                  : coinResult === 'tails'
+                  ? colors.warning
+                  : colors.border,
+            }}
+          >
+            {coinResult === 'heads' ? (
+              <MaterialIcons name="check-circle" size={64} color="white" />
+            ) : coinResult === 'tails' ? (
+              <MaterialIcons name="cancel" size={64} color="white" />
+            ) : (
+              <MaterialIcons name="help" size={64} color={colors.muted} />
+            )}
+          </View>
+        </Animated.View>
+      </View>
+
+      {coinResult && (
+        <View className="items-center gap-2">
+          <Text
+            className="text-2xl font-bold"
+            style={{
+              color:
+                coinResult === 'heads' ? colors.success : colors.warning,
+            }}
+          >
+            {coinResult === 'heads' ? '正面' : '反面'}
+          </Text>
+          <Text className="text-sm text-muted">
+            {coinResult === 'heads' ? '吉祥如意' : '需要谨慎'}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const renderBaguaContent = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="gap-4 pb-6">
+        {currentBagua ? (
+          <>
+            {/* Bagua Symbol and Name */}
+            <View className="items-center gap-3">
+              <Text className="text-6xl">{currentBagua.symbol}</Text>
+              <Text className="text-2xl font-bold text-foreground">
+                {currentBagua.name}
+              </Text>
+            </View>
+
+            {/* Bagua Meaning */}
+            <View
+              className="p-4 rounded-lg gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">含义</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentBagua.meaning}
+              </Text>
+            </View>
+
+            {/* Bagua Interpretation */}
+            <View
+              className="p-4 rounded-lg gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">解释</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentBagua.interpretation}
+              </Text>
+            </View>
+
+            {/* Bagua Advice */}
+            <View
+              className="p-4 rounded-lg gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">建议</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentBagua.advice}
+              </Text>
+            </View>
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-muted text-center">点击下方按钮占卜</Text>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  return (
+    <ScreenContainer className="p-4">
+      <View className="flex-1 gap-4">
+        {/* Title */}
+        <View className="gap-1 mb-2">
+          <Text className="text-3xl font-bold text-foreground">观音灵签</Text>
+          <Text className="text-sm text-muted">选择占卜方式</Text>
+        </View>
+
+        {/* Divination Type Tabs */}
+        <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Content Area */}
+        <View className="flex-1">
+          {activeTab === 'lots' && renderLotsContent()}
+          {activeTab === 'coin' && renderCoinContent()}
+          {activeTab === 'bagua' && renderBaguaContent()}
+        </View>
 
         {/* Draw Button */}
         <Pressable
@@ -186,43 +293,18 @@ export default function HomeScreen() {
           disabled={isDrawing}
           style={({ pressed }) => [
             {
-              width: 120,
-              height: 120,
-              borderRadius: 60,
               backgroundColor: colors.primary,
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+              borderRadius: 8,
               opacity: pressed || isDrawing ? 0.8 : 1,
-              transform: [
-                {
-                  scale: pressed || isDrawing ? 0.95 : 1,
-                },
-              ],
             },
           ]}
         >
-          <Animated.View
-            style={{
-              transform: [{ rotate: isDrawing ? spin : '0deg' }],
-            }}
-          >
-            <MaterialIcons
-              name="casino"
-              size={48}
-              color="white"
-            />
-          </Animated.View>
+          <Text className="text-center font-semibold text-white text-base">
+            {isDrawing ? '占卜中...' : '开始占卜'}
+          </Text>
         </Pressable>
-
-        {/* Button Label */}
-        <Text className="text-lg font-semibold text-foreground">
-          {isDrawing ? '抽签中...' : '点击抽签'}
-        </Text>
-
-        {/* Info Text */}
-        <Text className="text-sm text-muted text-center">
-          观音灵签共有100支，每支都蕴含着深刻的人生智慧
-        </Text>
       </View>
     </ScreenContainer>
   );

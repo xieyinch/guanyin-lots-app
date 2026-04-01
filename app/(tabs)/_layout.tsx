@@ -31,29 +31,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "抽签",
+          title: "占卜",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="coin"
+        name="history"
         options={{
-          title: "硬币",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="circle.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="bagua"
-        options={{
-          title: "八卦",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chevron.right" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: "收藏",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          title: "历史",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.fill" color={color} />,
         }}
       />
       <Tabs.Screen
