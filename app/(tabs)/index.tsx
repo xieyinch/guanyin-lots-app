@@ -10,6 +10,8 @@ import { useDailyLot } from '@/hooks/use-daily-lot';
 import { useLunarCalendar } from '@/hooks/use-lunar-calendar';
 import { useColors } from '@/hooks/use-colors';
 import { LunarCalendarCard } from '@/components/lunar-calendar-card';
+import { TCMHoursCard } from '@/components/tcm-hours-card';
+import { useTCMHours } from '@/hooks/use-tcm-hours';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 
@@ -20,10 +22,12 @@ export default function HomeScreen() {
   const { getRandomBagua } = useBagua();
   const { dailyLot, checkedIn, streak, checkIn, isLoading: dailyLoading } = useDailyLot();
   const { lunarInfo } = useLunarCalendar();
+  const { currentHour } = useTCMHours();
 
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
   const [spinValue] = useState(new Animated.Value(0));
+
 
   // Lots state
   const [currentLot, setCurrentLot] = useState<any>(null);
@@ -297,6 +301,9 @@ export default function HomeScreen() {
 
           {/* Lunar Calendar Card */}
           <LunarCalendarCard lunarInfo={lunarInfo} />
+
+          {/* TCM Hours Card */}
+          <TCMHoursCard hour={currentHour} />
 
           {/* Divination Type Tabs */}
           <View className="mt-2">
