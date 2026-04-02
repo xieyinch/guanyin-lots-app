@@ -7,7 +7,9 @@ import { useLots } from '@/hooks/use-lots';
 import { useCoinFlip } from '@/hooks/use-coin-flip';
 import { useBagua } from '@/hooks/use-bagua';
 import { useDailyLot } from '@/hooks/use-daily-lot';
+import { useLunarCalendar } from '@/hooks/use-lunar-calendar';
 import { useColors } from '@/hooks/use-colors';
+import { LunarCalendarCard } from '@/components/lunar-calendar-card';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 
@@ -17,6 +19,7 @@ export default function HomeScreen() {
   const { flipCoin } = useCoinFlip();
   const { getRandomBagua } = useBagua();
   const { dailyLot, checkedIn, streak, checkIn, isLoading: dailyLoading } = useDailyLot();
+  const { lunarInfo } = useLunarCalendar();
 
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
@@ -291,6 +294,9 @@ export default function HomeScreen() {
               isLoading={dailyLoading}
             />
           )}
+
+          {/* Lunar Calendar Card */}
+          <LunarCalendarCard lunarInfo={lunarInfo} />
 
           {/* Divination Type Tabs */}
           <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
