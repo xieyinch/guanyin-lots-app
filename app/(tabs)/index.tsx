@@ -277,10 +277,10 @@ export default function HomeScreen() {
   return (
     <ScreenContainer className="p-0">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        <View className="px-4 pt-4 pb-4 gap-4">
+        <View className="px-4 pt-6 pb-4 gap-5">
           {/* Title */}
-          <View className="gap-1">
-            <Text className="text-3xl font-bold text-foreground">观音灵签</Text>
+          <View className="gap-2 mb-2">
+            <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
             <Text className="text-sm text-muted">选择占卜方式</Text>
           </View>
 
@@ -299,10 +299,12 @@ export default function HomeScreen() {
           <LunarCalendarCard lunarInfo={lunarInfo} />
 
           {/* Divination Type Tabs */}
-          <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <View className="mt-2">
+            <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          </View>
 
           {/* Content Area */}
-          <View className="min-h-96">
+          <View className="min-h-96 mt-2">
             {activeTab === 'lots' && renderLotsContent()}
             {activeTab === 'coin' && renderCoinContent()}
             {activeTab === 'bagua' && renderBaguaContent()}
@@ -315,14 +317,19 @@ export default function HomeScreen() {
             style={({ pressed }) => [
               {
                 backgroundColor: colors.primary,
-                paddingVertical: 14,
+                paddingVertical: 16,
                 paddingHorizontal: 16,
-                borderRadius: 8,
-                opacity: pressed || isDrawing ? 0.8 : 1,
+                borderRadius: 12,
+                opacity: pressed || isDrawing ? 0.85 : 1,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 5,
               },
             ]}
           >
-            <Text className="text-center font-semibold text-white text-base">
+            <Text className="text-center font-bold text-white text-lg">
               {isDrawing ? '占卜中...' : '开始占卜'}
             </Text>
           </Pressable>

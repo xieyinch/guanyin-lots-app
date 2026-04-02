@@ -32,7 +32,7 @@ const env = {
   appSlug: "guanyin-lots-app",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310419663028415106/72WNYCmFLvDDdNLXrx4FvJ/icon-DPCxYegV55t57dw3wQLJfM.png",
+  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310419663028415106/72WNYCmFLvDDdNLXrx4FvJ/icon-Re3bDgV55pYCG2R2e4DWdz.webp",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,

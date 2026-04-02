@@ -32,9 +32,9 @@ export function DailyLotCard({
   };
 
   return (
-    <View className="px-4 mb-6 gap-3">
+    <View className="px-0 mb-6 gap-3">
       {/* Daily Lot Header */}
-      <View className="flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between px-4">
         <View className="flex-row items-center gap-2">
           <MaterialIcons name="today" size={20} color={colors.primary} />
           <Text className="text-sm font-semibold text-primary">每日一签</Text>
@@ -49,8 +49,15 @@ export function DailyLotCard({
 
       {/* Daily Lot Card */}
       <View
-        className="rounded-2xl p-6 gap-4"
-        style={{ backgroundColor: colors.surface }}
+        className="rounded-3xl p-6 gap-4 mx-4"
+        style={{ 
+          backgroundColor: colors.surface,
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
+          elevation: 3,
+        }}
       >
         {/* Lot Info */}
         <View className="gap-2">
@@ -96,26 +103,29 @@ export function DailyLotCard({
         <Pressable
           onPress={handleCheckIn}
           disabled={checkedIn || isLoading}
-          style={({ pressed }) => [
-            {
-              backgroundColor: checkedIn ? colors.success : colors.primary,
-              paddingVertical: 10,
-              paddingHorizontal: 12,
-              borderRadius: 8,
-              opacity: pressed || checkedIn ? 0.8 : 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            },
-          ]}
+          style={({ pressed }) => ({
+            backgroundColor: checkedIn ? colors.success : colors.primary,
+            paddingVertical: 14,
+            paddingHorizontal: 16,
+            borderRadius: 12,
+            opacity: pressed || checkedIn ? 0.85 : 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            shadowColor: checkedIn ? colors.success : colors.primary,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 2,
+          })}
         >
           <MaterialIcons
             name={checkedIn ? 'check-circle' : 'done'}
             size={18}
             color="white"
           />
-          <Text className="text-center font-semibold text-white text-sm">
+          <Text className="text-center font-bold text-white text-base">
             {checkedIn ? '已打卡' : '今日打卡'}
           </Text>
         </Pressable>
