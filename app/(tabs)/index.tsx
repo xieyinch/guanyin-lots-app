@@ -11,6 +11,8 @@ import { useLunarCalendar } from '@/hooks/use-lunar-calendar';
 import { useColors } from '@/hooks/use-colors';
 import { CalendarHoursCard } from '@/components/calendar-hours-card';
 import { useTCMHours } from '@/hooks/use-tcm-hours';
+import { useRandomHexagram } from '@/hooks/use-random-hexagram';
+import { HexagramModal } from '@/components/hexagram-modal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 
@@ -22,6 +24,7 @@ export default function HomeScreen() {
   const { dailyLot, checkedIn, streak, checkIn, isLoading: dailyLoading } = useDailyLot();
   const { lunarInfo } = useLunarCalendar();
   const { currentHour } = useTCMHours();
+  const { hexagram, isVisible, closeHexagram } = useRandomHexagram();
 
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
@@ -338,6 +341,9 @@ export default function HomeScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      {/* Random Hexagram Modal */}
+      <HexagramModal visible={isVisible} hexagram={hexagram} onClose={closeHexagram} />
     </ScreenContainer>
   );
 }
