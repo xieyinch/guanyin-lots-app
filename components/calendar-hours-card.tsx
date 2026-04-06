@@ -5,9 +5,10 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 interface CalendarHoursCardProps {
   lunarInfo: any;
   hour: any;
+  moonPhase?: any;
 }
 
-export function CalendarHoursCard({ lunarInfo, hour }: CalendarHoursCardProps) {
+export function CalendarHoursCard({ lunarInfo, hour, moonPhase }: CalendarHoursCardProps) {
   const colors = useColors();
 
   if (!lunarInfo || !hour) {
@@ -74,6 +75,29 @@ export function CalendarHoursCard({ lunarInfo, hour }: CalendarHoursCardProps) {
             <Text className="text-sm font-semibold text-foreground">{lunarInfo.fiveElements}</Text>
           </View>
         </View>
+
+        {/* Moon Phase */}
+        {moonPhase && (
+          <View
+            className="p-4 rounded-2xl"
+            style={{ backgroundColor: colors.primary + '15' }}
+          >
+            <View className="flex-row items-center gap-2 mb-2">
+              <Text className="text-2xl">{moonPhase.emoji}</Text>
+              <View className="flex-1">
+                <Text className="text-sm font-semibold text-foreground">{moonPhase.name}</Text>
+                <Text className="text-xs text-muted">照亮度: {moonPhase.illumination}%</Text>
+              </View>
+            </View>
+            <Text className="text-xs text-foreground leading-relaxed mb-2">{moonPhase.description}</Text>
+            <View
+              className="p-2 rounded-lg"
+              style={{ backgroundColor: colors.primary + '25' }}
+            >
+              <Text className="text-xs text-foreground">{moonPhase.influence}</Text>
+            </View>
+          </View>
+        )}
       </View>
 
       {/* Divider */}

@@ -13,6 +13,7 @@ import { CalendarHoursCard } from '@/components/calendar-hours-card';
 import { useTCMHours } from '@/hooks/use-tcm-hours';
 import { useRandomHexagram } from '@/hooks/use-random-hexagram';
 import { HexagramModal } from '@/components/hexagram-modal';
+import { useMoonPhase } from '@/hooks/use-moon-phase';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 
@@ -25,6 +26,7 @@ export default function HomeScreen() {
   const { lunarInfo } = useLunarCalendar();
   const { currentHour } = useTCMHours();
   const { hexagram, isVisible, closeHexagram } = useRandomHexagram();
+  const moonPhase = useMoonPhase();
 
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
@@ -302,7 +304,7 @@ export default function HomeScreen() {
           )}
 
           {/* Combined Lunar Calendar and TCM Hours Card */}
-          <CalendarHoursCard lunarInfo={lunarInfo} hour={currentHour} />
+          <CalendarHoursCard lunarInfo={lunarInfo} hour={currentHour} moonPhase={moonPhase} />
 
           {/* Divination Type Tabs */}
           <View className="mt-2">
