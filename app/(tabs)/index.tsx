@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { View, Text, Animated, ScrollView, Pressable } from 'react-native';
+import { useState, useEffect } from 'react';
 import { ScreenContainer } from '@/components/screen-container';
 import { DivinationTabs, DivinationType } from '@/components/divination-tabs';
 import { DailyLotCard } from '@/components/daily-lot-card';
@@ -13,16 +13,18 @@ import { CalendarHoursCard } from '@/components/calendar-hours-card';
 import { useTCMHours } from '@/hooks/use-tcm-hours';
 import { useRandomHexagram } from '@/hooks/use-random-hexagram';
 import { HexagramModal } from '@/components/hexagram-modal';
+import { DailyLotModal } from '@/components/daily-lot-modal';
 import { useMoonPhase } from '@/hooks/use-moon-phase';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
+
 
 export default function HomeScreen() {
   const colors = useColors();
   const { getRandomLot } = useLots();
   const { flipCoin } = useCoinFlip();
   const { getRandomBagua } = useBagua();
-  const { dailyLot, checkedIn, streak, checkIn, isLoading: dailyLoading } = useDailyLot();
+  const { dailyLot, checkedIn, streak, isLoading: dailyLoading, shouldShowModal, setShouldShowModal, checkIn } = useDailyLot();
   const { lunarInfo } = useLunarCalendar();
   const { currentHour } = useTCMHours();
   const { hexagram, isVisible, closeHexagram } = useRandomHexagram();
@@ -31,12 +33,18 @@ export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<DivinationType>('lots');
   const [isDrawing, setIsDrawing] = useState(false);
   const [spinValue] = useState(new Animated.Value(0));
+  const [dailyLotModalVisible, setDailyLotModalVisible] = useState(false);
 
+  // Auto-show daily lot modal on first app open
+  useEffect(() => {
+    if (shouldShowModal && !dailyLotModalVisible) {
+      setDailyLotModalVisible(true);
+      setShouldShowModal(false);
+    }
+  }, [shouldShowModal, dailyLotModalVisible, setShouldShowModal]);
 
   // Lots state
   const [currentLot, setCurrentLot] = useState<any>(null);
-
-  // Coin state
   const [coinResult, setCoinResult] = useState<'heads' | 'tails' | null>(null);
 
   // Bagua state

@@ -11,6 +11,7 @@ export interface DailyLotRecord {
 
 const DAILY_LOT_KEY = 'guanyin_daily_lot';
 const CHECK_IN_KEY = 'guanyin_check_in_history';
+const MODAL_SHOWN_KEY = 'guanyin_modal_shown_today';
 
 /**
  * Hook to manage daily lot (每日一签) functionality
@@ -21,9 +22,11 @@ export function useDailyLot() {
   const [checkedIn, setCheckedIn] = useState(false);
   const [streak, setStreak] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
 
   useEffect(() => {
     loadDailyLot();
+    checkIfShouldShowModal();
   }, [lots]);
 
   /**
@@ -41,6 +44,23 @@ export function useDailyLot() {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     return yesterday.toISOString().split('T')[0];
+  };
+
+  /**
+   * Check if modal should be shown on first app open of the day
+   */
+  const checkIfShouldShowModal = async () => {
+    try {
+      const today = getTodayDate();
+      const lastShown = await AsyncStorage.getItem(MODAL_SHOWN_KEY);
+
+      if (lastShown !== today) {
+        setShouldShowModal(true);
+        await AsyncStorage.setItem(MODAL_SHOWN_KEY, today);
+      }
+    } catch (error) {
+      console.error('Failed to check modal status:', error);
+    }
   };
 
   /**
@@ -158,5 +178,7 @@ export function useDailyLot() {
     isLoading,
     checkIn,
     reloadDailyLot: loadDailyLot,
+    shouldShowModal,
+    setShouldShowModal,
   };
 }
