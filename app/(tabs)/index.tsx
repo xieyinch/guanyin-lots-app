@@ -294,22 +294,24 @@ export default function HomeScreen() {
     <ScreenContainer className="p-0">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         <View className="px-4 pt-6 pb-4 gap-5">
-          {/* Title */}
-          <View className="gap-2 mb-2">
-            <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
-            <Text className="text-sm text-muted">选择占卜方式</Text>
+          {/* Header with Title and Daily Lot Icon */}
+          <View className="flex-row justify-between items-start gap-2 mb-2">
+            <View className="flex-1 gap-2">
+              <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
+              <Text className="text-sm text-muted">选择占卜方式</Text>
+            </View>
+            {/* Daily Lot Icon Button */}
+            <Pressable
+              onPress={() => setDailyLotModalVisible(true)}
+              style={({ pressed }) => [{
+                opacity: pressed ? 0.6 : 1,
+              }]}
+            >
+              <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.surface }}>
+                <MaterialIcons name="calendar-today" size={20} color={colors.primary} />
+              </View>
+            </Pressable>
           </View>
-
-          {/* Daily Lot Card */}
-          {dailyLot && (
-            <DailyLotCard
-              lot={dailyLot}
-              checkedIn={checkedIn}
-              streak={streak}
-              onCheckIn={checkIn}
-              isLoading={dailyLoading}
-            />
-          )}
 
           {/* Combined Lunar Calendar and TCM Hours Card */}
           <CalendarHoursCard lunarInfo={lunarInfo} hour={currentHour} moonPhase={moonPhase} />
@@ -354,6 +356,12 @@ export default function HomeScreen() {
 
       {/* Random Hexagram Modal */}
       <HexagramModal visible={isVisible} hexagram={hexagram} onClose={closeHexagram} />
+
+      {/* Daily Lot Modal */}
+      <DailyLotModal
+        visible={dailyLotModalVisible}
+        onClose={() => setDailyLotModalVisible(false)}
+      />
     </ScreenContainer>
   );
 }
