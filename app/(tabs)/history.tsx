@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable, Alert } from 'react-native';
+import { View, Text, FlatList, Pressable, Alert, ScrollView } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLots } from '@/hooks/use-lots';
 import { useCoinFlip } from '@/hooks/use-coin-flip';
 import { useBagua } from '@/hooks/use-bagua';
+import { useDivinationStats } from '@/hooks/use-divination-stats';
+import { DivinationStatsCard } from '@/components/divination-stats-card';
 import { useColors } from '@/hooks/use-colors';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
@@ -20,6 +22,7 @@ export default function HistoryScreen() {
   const { history: lotsHistory, clearHistory: clearLotsHistory } = useLots();
   const { history: coinHistory, clearHistory: clearCoinHistory } = useCoinFlip();
   const { history: baguaHistory, clearHistory: clearBaguaHistory } = useBagua();
+  const { stats, timeRange, setTimeRange, totalCount, divinationStats } = useDivinationStats();
 
   const [allHistory, setAllHistory] = useState<HistoryItem[]>([]);
 
@@ -178,9 +181,9 @@ export default function HistoryScreen() {
 
   return (
     <ScreenContainer className="bg-background">
-      <View className="flex-1 gap-4">
+      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4 pt-4">
+        <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
           <View>
             <Text className="text-3xl font-bold text-foreground">
               占卜历史
@@ -201,16 +204,25 @@ export default function HistoryScreen() {
           </Pressable>
         </View>
 
-        {/* History List */}
-        <FlatList
-          data={allHistory}
-          renderItem={renderHistoryItem}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={true}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 16 }}
+        {/* Statistics Card */}
+        <DivinationStatsCard
+          stats={divinationStats}
+          totalCount={totalCount}
+          timeRange={timeRange}
+          onTimeRangeChange={setTimeRange}
         />
-      </View>
+
+        {/* History List */}
+        <View className="pb-6">
+          <FlatList
+            data={allHistory}
+            renderItem={renderHistoryItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      </ScrollView>
     </ScreenContainer>
   );
 }
