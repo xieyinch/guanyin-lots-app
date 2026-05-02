@@ -6,6 +6,7 @@ import { DailyLotCard } from '@/components/daily-lot-card';
 import { useLots } from '@/hooks/use-lots';
 import { useCoinFlip } from '@/hooks/use-coin-flip';
 import { useBagua } from '@/hooks/use-bagua';
+import { useTarot } from '@/hooks/use-tarot';
 import { useDailyLot } from '@/hooks/use-daily-lot';
 import { useLunarCalendar } from '@/hooks/use-lunar-calendar';
 import { useColors } from '@/hooks/use-colors';
@@ -24,6 +25,7 @@ export default function HomeScreen() {
   const { getRandomLot } = useLots();
   const { flipCoin } = useCoinFlip();
   const { getRandomBagua } = useBagua();
+  const { getRandomTarot } = useTarot();
   const { dailyLot, checkedIn, streak, isLoading: dailyLoading, shouldShowModal, setShouldShowModal, checkIn } = useDailyLot();
   const { lunarInfo } = useLunarCalendar();
   const { currentHour } = useTCMHours();
@@ -49,6 +51,9 @@ export default function HomeScreen() {
 
   // Bagua state
   const [currentBagua, setCurrentBagua] = useState<any>(null);
+
+  // Tarot state
+  const [currentTarot, setCurrentTarot] = useState<any>(null);
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -78,6 +83,9 @@ export default function HomeScreen() {
       } else if (activeTab === 'bagua') {
         const bagua = await getRandomBagua();
         setCurrentBagua(bagua);
+      } else if (activeTab === 'tarot') {
+        const tarot = await getRandomTarot();
+        setCurrentTarot(tarot);
       }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -290,6 +298,76 @@ export default function HomeScreen() {
     </ScrollView>
   );
 
+  const renderTarotContent = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="gap-4 pb-6">
+        {currentTarot ? (
+          <>
+            {/* Tarot Card Name and Suit */}
+            <View
+              className="rounded-2xl p-6 gap-3 items-center"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-6xl mb-2">🃏</Text>
+              <View className="items-center">
+                <Text className="text-sm text-muted">{currentTarot.suit}</Text>
+                <Text className="text-2xl font-bold text-foreground">
+                  {currentTarot.name}
+                </Text>
+                {currentTarot.isReversed && (
+                  <Text className="text-xs text-warning font-semibold mt-2">逆位</Text>
+                )}
+              </View>
+            </View>
+
+            {/* Tarot Description */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">描述</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentTarot.description}
+              </Text>
+            </View>
+
+            {/* Tarot Meaning */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">
+                {currentTarot.isReversed ? '逆位含义' : '正位含义'}
+              </Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentTarot.isReversed ? currentTarot.reversed : currentTarot.meaning}
+              </Text>
+            </View>
+
+            {/* Tarot Advice */}
+            <View
+              className="rounded-lg p-4 gap-2"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-xs font-semibold text-muted uppercase">建议</Text>
+              <Text className="text-sm leading-relaxed text-foreground">
+                {currentTarot.advice}
+              </Text>
+            </View>
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-muted text-center">点击下方按钮抽牌</Text>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+
   return (
     <ScreenContainer className="p-0">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
@@ -326,6 +404,7 @@ export default function HomeScreen() {
             {activeTab === 'lots' && renderLotsContent()}
             {activeTab === 'coin' && renderCoinContent()}
             {activeTab === 'bagua' && renderBaguaContent()}
+            {activeTab === 'tarot' && renderTarotContent()}
           </View>
 
           {/* Draw Button */}
