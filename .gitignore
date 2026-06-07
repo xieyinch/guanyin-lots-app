@@ -63,3 +63,7 @@ Thumbs.db
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+android/build/
+android/.gradle/
+android/app/build/
+android/local.properties
