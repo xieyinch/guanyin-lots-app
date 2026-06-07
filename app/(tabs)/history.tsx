@@ -8,6 +8,7 @@ import { useDivinationStats } from '@/hooks/use-divination-stats';
 import { DivinationStatsCard } from '@/components/divination-stats-card';
 import { useColors } from '@/hooks/use-colors';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import * as Haptics from 'expo-haptics';
 
 interface HistoryItem {
@@ -107,26 +108,28 @@ export default function HistoryScreen() {
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'lots':
-        return '🎰';
-      case 'coin':
-        return '🪙';
-      case 'bagua':
-        return '☯️';
+  const getGradeColor = (grade: string) => {
+    switch (grade) {
+      case '上签':
+        return colors.success;
+      case '中签':
+        return colors.warning;
+      case '下签':
+        return colors.error;
       default:
-        return '✨';
+        return colors.muted;
     }
   };
 
   const renderHistoryItem = ({ item }: { item: HistoryItem }) => {
     let title = '';
     let subtitle = '';
+    let grade = '';
 
     if (item.type === 'lots') {
       title = item.data.name;
-      subtitle = `第 ${item.data.id} 签 · ${item.data.grade}`;
+      subtitle = `第 ${item.data.id} 签`;
+      grade = item.data.grade;
     } else if (item.type === 'coin') {
       title = item.data === 'heads' ? '正面' : '反面';
       subtitle = item.data === 'heads' ? '吉祥如意' : '需要谨慎';
@@ -137,25 +140,46 @@ export default function HistoryScreen() {
 
     return (
       <View
-        className="mx-4 my-2 p-4 rounded-lg flex-row items-center justify-between"
-        style={{ backgroundColor: colors.surface }}
+        className="mx-4 mb-3 p-4 rounded-2xl"
+        style={{ 
+          backgroundColor: colors.surface,
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 2,
+        }}
       >
-        <View className="flex-row items-center gap-3 flex-1">
-          <Text className="text-2xl">{getTypeIcon(item.type)}</Text>
-          <View className="flex-1">
-            <View className="flex-row items-center gap-2">
-              <Text className="text-xs font-semibold text-muted">
-                {getTypeLabel(item.type)}
+        <View className="flex-row items-center gap-3">
+          <View 
+            className="w-12 h-12 rounded-xl items-center justify-center"
+            style={{ backgroundColor: colors.backgroundSecondary }}
+          >
+            <Text className="text-2xl">
+              {item.type === 'lots' ? '🎯' : item.type === 'coin' ? '💰' : '☯️'}
+            </Text>
+          </View>
+          <View className="flex-1 gap-1">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm font-medium" style={{ color: colors.muted }}>
+                {getTypeLabel(item.type)} · {formatTime(item.timestamp)}
               </Text>
+              {grade && (
+                <View 
+                  className="px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: getGradeColor(grade) + '20' }}
+                >
+                  <Text className="text-xs font-bold" style={{ color: getGradeColor(grade) }}>
+                    {grade}
+                  </Text>
+                </View>
+              )}
             </View>
-            <Text className="text-base font-semibold text-foreground">
+            <Text className="text-base font-bold" style={{ color: colors.foreground }}>
               {title}
             </Text>
-            <Text className="text-xs text-muted mt-1">
+            <Text className="text-xs" style={{ color: colors.foregroundSecondary }}>
               {subtitle}
-            </Text>
-            <Text className="text-xs text-muted mt-1">
-              {formatTime(item.timestamp)}
             </Text>
           </View>
         </View>
@@ -165,15 +189,22 @@ export default function HistoryScreen() {
 
   if (allHistory.length === 0) {
     return (
-      <ScreenContainer className="items-center justify-center">
-        <View className="items-center gap-4">
-          <MaterialIcons name="history" size={48} color={colors.muted} />
-          <Text className="text-lg font-semibold text-foreground">
-            暂无占卜历史
-          </Text>
-          <Text className="text-sm text-muted text-center">
-            开始占卜后，历史记录将显示在这里
-          </Text>
+      <ScreenContainer className="bg-background">
+        <View className="flex-1 items-center justify-center gap-6 px-8">
+          <View 
+            className="w-24 h-24 rounded-full items-center justify-center"
+            style={{ backgroundColor: colors.surface }}
+          >
+            <MaterialIcons name="history" size={48} color={colors.muted} />
+          </View>
+          <View className="items-center gap-2">
+            <Text className="text-xl font-bold text-center" style={{ color: colors.foreground }}>
+              暂无占卜历史
+            </Text>
+            <Text className="text-sm text-center" style={{ color: colors.muted }}>
+              开始占卜后，历史记录将显示在这里
+            </Text>
+          </View>
         </View>
       </ScreenContainer>
     );
@@ -182,45 +213,45 @@ export default function HistoryScreen() {
   return (
     <ScreenContainer className="bg-background">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
-          <View>
-            <Text className="text-3xl font-bold text-foreground">
-              占卜历史
-            </Text>
-            <Text className="text-sm text-muted">
-              共 {allHistory.length} 条记录
-            </Text>
-          </View>
-          <Pressable
-            onPress={handleClearAll}
-            style={({ pressed }) => [
-              {
+        <View className="px-5 pt-4 pb-6 gap-6">
+          <View className="flex-row items-center justify-between pt-2">
+            <View className="flex-1">
+              <Text className="text-3xl font-bold" style={{ color: colors.foreground }}>
+                占卜历史
+              </Text>
+              <Text className="text-sm mt-1" style={{ color: colors.muted }}>
+                共 {allHistory.length} 条记录
+              </Text>
+            </View>
+            <Pressable
+              onPress={handleClearAll}
+              style={({ pressed }) => ({
                 opacity: pressed ? 0.7 : 1,
-              },
-            ]}
-          >
-            <MaterialIcons name="delete-outline" size={24} color={colors.error} />
-          </Pressable>
-        </View>
+                backgroundColor: colors.error + '15',
+                padding: 10,
+                borderRadius: 12,
+              })}
+            >
+              <MaterialIcons name="delete-outline" size={22} color={colors.error} />
+            </Pressable>
+          </View>
 
-        {/* Statistics Card */}
-        <DivinationStatsCard
-          stats={divinationStats}
-          totalCount={totalCount}
-          timeRange={timeRange}
-          onTimeRangeChange={setTimeRange}
-        />
-
-        {/* History List */}
-        <View className="pb-6">
-          <FlatList
-            data={allHistory}
-            renderItem={renderHistoryItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            showsVerticalScrollIndicator={false}
+          <DivinationStatsCard
+            stats={divinationStats}
+            totalCount={totalCount}
+            timeRange={timeRange}
+            onTimeRangeChange={setTimeRange}
           />
+
+          <View className="pb-4">
+            <FlatList
+              data={allHistory}
+              renderItem={renderHistoryItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
         </View>
       </ScrollView>
     </ScreenContainer>

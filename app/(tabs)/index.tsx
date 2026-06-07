@@ -1,8 +1,7 @@
-import { View, Text, Animated, ScrollView, Pressable } from 'react-native';
+import { View, Text, Animated, ScrollView, Pressable, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import { ScreenContainer } from '@/components/screen-container';
 import { DivinationTabs, DivinationType } from '@/components/divination-tabs';
-import { DailyLotCard } from '@/components/daily-lot-card';
 import { useLots } from '@/hooks/use-lots';
 import { useCoinFlip } from '@/hooks/use-coin-flip';
 import { useBagua } from '@/hooks/use-bagua';
@@ -17,7 +16,9 @@ import { HexagramModal } from '@/components/hexagram-modal';
 import { DailyLotModal } from '@/components/daily-lot-modal';
 import { useMoonPhase } from '@/hooks/use-moon-phase';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 export default function HomeScreen() {
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const { flipCoin } = useCoinFlip();
   const { getRandomBagua } = useBagua();
   const { getRandomTarot } = useTarot();
-  const { dailyLot, checkedIn, streak, isLoading: dailyLoading, shouldShowModal, setShouldShowModal, checkIn } = useDailyLot();
+  const { dailyLot, checkedIn, isLoading: dailyLoading, shouldShowModal, setShouldShowModal, checkIn } = useDailyLot();
   const { lunarInfo } = useLunarCalendar();
   const { currentHour } = useTCMHours();
   const { hexagram, isVisible, closeHexagram } = useRandomHexagram();
@@ -37,7 +38,6 @@ export default function HomeScreen() {
   const [spinValue] = useState(new Animated.Value(0));
   const [dailyLotModalVisible, setDailyLotModalVisible] = useState(false);
 
-  // Auto-show daily lot modal on first app open
   useEffect(() => {
     if (shouldShowModal && !dailyLotModalVisible) {
       setDailyLotModalVisible(true);
@@ -45,14 +45,9 @@ export default function HomeScreen() {
     }
   }, [shouldShowModal, dailyLotModalVisible, setShouldShowModal]);
 
-  // Lots state
   const [currentLot, setCurrentLot] = useState<any>(null);
   const [coinResult, setCoinResult] = useState<'heads' | 'tails' | null>(null);
-
-  // Bagua state
   const [currentBagua, setCurrentBagua] = useState<any>(null);
-
-  // Tarot state
   const [currentTarot, setCurrentTarot] = useState<any>(null);
 
   const spin = spinValue.interpolate({
@@ -101,21 +96,20 @@ export default function HomeScreen() {
     >
       <View className="gap-4 pb-6">
         {currentLot ? (
-          <>
-            {/* Lot Number and Name */}
+          <View className="gap-4">
             <View
               className="rounded-2xl p-6 gap-3"
               style={{ backgroundColor: colors.surface }}
             >
               <View className="flex-row justify-between items-center">
-                <View>
-                  <Text className="text-sm text-muted">第 {currentLot.id} 签</Text>
-                  <Text className="text-2xl font-bold text-foreground">
+                <View className="flex-1">
+                  <Text className="text-xs font-medium" style={{ color: colors.muted }}>第 {currentLot.id} 签</Text>
+                  <Text className="text-2xl font-bold mt-1" style={{ color: colors.foreground }}>
                     {currentLot.name}
                   </Text>
                 </View>
                 <View
-                  className="px-3 py-1 rounded-full"
+                  className="px-4 py-2 rounded-full"
                   style={{
                     backgroundColor:
                       currentLot.grade === '上签'
@@ -123,64 +117,66 @@ export default function HomeScreen() {
                         : currentLot.grade === '中签'
                         ? colors.warning
                         : colors.error,
+                    shadowColor: currentLot.grade === '上签' ? colors.success : colors.error,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4,
                   }}
                 >
-                  <Text className="text-xs font-semibold text-white">
+                  <Text className="text-sm font-bold text-white">
                     {currentLot.grade}
                   </Text>
                 </View>
               </View>
             </View>
 
-            {/* Lot Poem */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">签诗</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="rounded-2xl p-5 gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialCommunityIcons name="format-quote-open" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>签诗</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentLot.poem}
               </Text>
             </View>
 
-            {/* Lot Interpretation */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">解曰</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="rounded-2xl p-5 gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="lightbulb-outline" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>解曰</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentLot.interpretation}
               </Text>
             </View>
 
-            {/* Lot Details */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">详解</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="rounded-2xl p-5 gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="description" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>详解</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentLot.details}
               </Text>
             </View>
 
-            {/* Lot Story */}
             {currentLot.story && (
-              <View
-                className="rounded-lg p-4 gap-2"
-                style={{ backgroundColor: colors.surface }}
-              >
-                <Text className="text-xs font-semibold text-muted uppercase">典故</Text>
-                <Text className="text-sm leading-relaxed text-foreground">
+              <View className="rounded-2xl p-5 gap-3" style={{ backgroundColor: colors.surface }}>
+                <View className="flex-row items-center gap-2">
+                  <MaterialIcons name="auto-stories" size={20} color={colors.primary} />
+                  <Text className="text-sm font-bold" style={{ color: colors.foreground }}>典故</Text>
+                </View>
+                <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                   {currentLot.story}
                 </Text>
               </View>
             )}
-          </>
+          </View>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮抽签</Text>
+          <View className="flex-1 items-center justify-center py-12 gap-4">
+            <MaterialCommunityIcons name="hand-back-left-outline" size={64} color={colors.muted} />
+            <Text className="text-base text-center" style={{ color: colors.muted }}>点击下方按钮开始占卜</Text>
           </View>
         )}
       </View>
@@ -188,10 +184,17 @@ export default function HomeScreen() {
   );
 
   const renderCoinContent = () => (
-    <View className="flex-1 items-center justify-center gap-6">
+    <View className="flex-1 items-center justify-center gap-8">
       <View
-        className="w-32 h-32 rounded-full items-center justify-center"
-        style={{ backgroundColor: colors.surface }}
+        className="w-40 h-40 rounded-full items-center justify-center"
+        style={{ 
+          backgroundColor: colors.surface,
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 12,
+          elevation: 8,
+        }}
       >
         <Animated.View
           style={{
@@ -199,7 +202,7 @@ export default function HomeScreen() {
           }}
         >
           <View
-            className="w-32 h-32 rounded-full items-center justify-center"
+            className="w-40 h-40 rounded-full items-center justify-center"
             style={{
               backgroundColor:
                 coinResult === 'heads'
@@ -210,28 +213,25 @@ export default function HomeScreen() {
             }}
           >
             {coinResult === 'heads' ? (
-              <MaterialIcons name="check-circle" size={64} color="white" />
+              <MaterialIcons name="check-circle" size={80} color="white" />
             ) : coinResult === 'tails' ? (
-              <MaterialIcons name="cancel" size={64} color="white" />
+              <MaterialIcons name="close" size={80} color="white" />
             ) : (
-              <MaterialIcons name="help" size={64} color={colors.muted} />
+              <MaterialIcons name="help-outline" size={80} color={colors.muted} />
             )}
           </View>
         </Animated.View>
       </View>
 
       {coinResult && (
-        <View className="items-center gap-2">
+        <View className="items-center gap-3">
           <Text
-            className="text-2xl font-bold"
-            style={{
-              color:
-                coinResult === 'heads' ? colors.success : colors.warning,
-            }}
+            className="text-3xl font-bold"
+            style={{ color: coinResult === 'heads' ? colors.success : colors.warning }}
           >
             {coinResult === 'heads' ? '正面' : '反面'}
           </Text>
-          <Text className="text-sm text-muted">
+          <Text className="text-base" style={{ color: colors.foregroundSecondary }}>
             {coinResult === 'heads' ? '吉祥如意' : '需要谨慎'}
           </Text>
         </View>
@@ -247,51 +247,51 @@ export default function HomeScreen() {
     >
       <View className="gap-4 pb-6">
         {currentBagua ? (
-          <>
-            {/* Bagua Symbol and Name */}
-            <View className="items-center gap-3">
-              <Text className="text-6xl">{currentBagua.symbol}</Text>
-              <Text className="text-2xl font-bold text-foreground">
+          <View className="gap-4">
+            <View 
+              className="items-center gap-4 p-8 rounded-2xl" 
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-7xl">{currentBagua.symbol}</Text>
+              <Text className="text-3xl font-bold" style={{ color: colors.foreground }}>
                 {currentBagua.name}
               </Text>
             </View>
 
-            {/* Bagua Meaning */}
-            <View
-              className="p-4 rounded-lg gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">含义</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="info-outline" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>含义</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentBagua.meaning}
               </Text>
             </View>
 
-            {/* Bagua Interpretation */}
-            <View
-              className="p-4 rounded-lg gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">解释</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="lightbulb-outline" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>解释</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentBagua.interpretation}
               </Text>
             </View>
 
-            {/* Bagua Advice */}
-            <View
-              className="p-4 rounded-lg gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">建议</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="tips-and-updates" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>建议</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentBagua.advice}
               </Text>
             </View>
-          </>
+          </View>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮占卜</Text>
+          <View className="flex-1 items-center justify-center py-12 gap-4">
+            <MaterialCommunityIcons name="yin-yang" size={64} color={colors.muted} />
+            <Text className="text-base text-center" style={{ color: colors.muted }}>点击下方按钮开始占卜</Text>
           </View>
         )}
       </View>
@@ -306,62 +306,70 @@ export default function HomeScreen() {
     >
       <View className="gap-4 pb-6">
         {currentTarot ? (
-          <>
-            {/* Tarot Card Name and Suit */}
+          <View className="gap-4">
             <View
-              className="rounded-2xl p-6 gap-3 items-center"
-              style={{ backgroundColor: colors.surface }}
+              className="rounded-2xl p-8 gap-4 items-center"
+              style={{ 
+                backgroundColor: colors.surface,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.15,
+                shadowRadius: 12,
+                elevation: 6,
+              }}
             >
-              <Text className="text-6xl mb-2">🃏</Text>
-              <View className="items-center">
-                <Text className="text-sm text-muted">{currentTarot.suit}</Text>
-                <Text className="text-2xl font-bold text-foreground">
+              <View className="w-24 h-32 rounded-lg items-center justify-center" style={{ backgroundColor: colors.backgroundSecondary }}>
+                <Text className="text-6xl">🃏</Text>
+              </View>
+              <View className="items-center gap-2">
+                <Text className="text-xs font-medium uppercase tracking-wider" style={{ color: colors.muted }}>{currentTarot.suit}</Text>
+                <Text className="text-2xl font-bold text-center" style={{ color: colors.foreground }}>
                   {currentTarot.name}
                 </Text>
                 {currentTarot.isReversed && (
-                  <Text className="text-xs text-warning font-semibold mt-2">逆位</Text>
+                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: colors.warning }}>
+                    <Text className="text-xs font-bold text-white">逆位</Text>
+                  </View>
                 )}
               </View>
             </View>
 
-            {/* Tarot Description */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">描述</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="description" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>描述</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentTarot.description}
               </Text>
             </View>
 
-            {/* Tarot Meaning */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">
-                {currentTarot.isReversed ? '逆位含义' : '正位含义'}
-              </Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="psychology" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>
+                  {currentTarot.isReversed ? '逆位含义' : '正位含义'}
+                </Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentTarot.isReversed ? currentTarot.reversed : currentTarot.meaning}
               </Text>
             </View>
 
-            {/* Tarot Advice */}
-            <View
-              className="rounded-lg p-4 gap-2"
-              style={{ backgroundColor: colors.surface }}
-            >
-              <Text className="text-xs font-semibold text-muted uppercase">建议</Text>
-              <Text className="text-sm leading-relaxed text-foreground">
+            <View className="p-5 rounded-2xl gap-3" style={{ backgroundColor: colors.surface }}>
+              <View className="flex-row items-center gap-2">
+                <MaterialIcons name="tips-and-updates" size={20} color={colors.primary} />
+                <Text className="text-sm font-bold" style={{ color: colors.foreground }}>建议</Text>
+              </View>
+              <Text className="text-base leading-relaxed" style={{ color: colors.foregroundSecondary }}>
                 {currentTarot.advice}
               </Text>
             </View>
-          </>
+          </View>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮抽牌</Text>
+          <View className="flex-1 items-center justify-center py-12 gap-4">
+            <Text className="text-6xl">🎴</Text>
+            <Text className="text-base text-center" style={{ color: colors.muted }}>点击下方按钮抽牌</Text>
           </View>
         )}
       </View>
@@ -369,74 +377,83 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScreenContainer className="p-0">
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        <View className="px-4 pt-6 pb-4 gap-5">
-          {/* Header with Title and Daily Lot Icon */}
-          <View className="flex-row justify-between items-start gap-2 mb-2">
-            <View className="flex-1 gap-2">
-              <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
-              <Text className="text-sm text-muted">选择占卜方式</Text>
+    <ScreenContainer className="p-0" containerClassName={{ backgroundColor: colors.background }}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View className="px-5 pt-4 pb-6 gap-6">
+          <View className="flex-row justify-between items-center gap-3 pt-2">
+            <View className="flex-1 gap-1">
+              <Text className="text-3xl font-bold" style={{ color: colors.foreground }}>观音灵签</Text>
+              <Text className="text-sm" style={{ color: colors.muted }}>选择占卜方式</Text>
             </View>
-            {/* Daily Lot Icon Button */}
             <Pressable
               onPress={() => setDailyLotModalVisible(true)}
               style={({ pressed }) => [{
                 opacity: pressed ? 0.6 : 1,
+                backgroundColor: colors.surface,
+                borderRadius: 12,
+                padding: 10,
               }]}
             >
-              <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.surface }}>
-                <MaterialIcons name="calendar-today" size={20} color={colors.primary} />
-              </View>
+              <MaterialIcons name="calendar-today" size={22} color={colors.primary} />
             </Pressable>
           </View>
 
-          {/* Combined Lunar Calendar and TCM Hours Card */}
           <CalendarHoursCard lunarInfo={lunarInfo} hour={currentHour} moonPhase={moonPhase} />
 
-          {/* Divination Type Tabs */}
-          <View className="mt-2">
-            <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
-          </View>
+          <DivinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Content Area */}
-          <View className="min-h-96 mt-2">
+          <View 
+            className="min-h-96 rounded-2xl p-4" 
+            style={{ backgroundColor: colors.backgroundSecondary }}
+          >
             {activeTab === 'lots' && renderLotsContent()}
             {activeTab === 'coin' && renderCoinContent()}
             {activeTab === 'bagua' && renderBaguaContent()}
             {activeTab === 'tarot' && renderTarotContent()}
           </View>
 
-          {/* Draw Button */}
           <Pressable
             onPress={handleDraw}
             disabled={isDrawing}
-            style={({ pressed }) => [
-              {
-                backgroundColor: colors.primary,
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-                borderRadius: 12,
-                opacity: pressed || isDrawing ? 0.85 : 1,
-                shadowColor: colors.primary,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 5,
-              },
-            ]}
+            className="rounded-2xl"
+            style={({ pressed }) => ({
+              opacity: pressed || isDrawing ? 0.9 : 1,
+              transform: pressed ? [{ scale: 0.98 }] : [],
+              shadowColor: colors.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.4,
+              shadowRadius: 12,
+              elevation: 8,
+            })}
           >
-            <Text className="text-center font-bold text-white text-lg">
-              {isDrawing ? '占卜中...' : '开始占卜'}
-            </Text>
+            <LinearGradient
+              colors={isDrawing ? [colors.primary, colors.primary] : [colors.primary, colors.secondary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="rounded-2xl py-4 px-6"
+            >
+              <View className="flex-row items-center justify-center gap-3">
+                <MaterialCommunityIcons 
+                  name={isDrawing ? 'loading' : 'magic-staff'} 
+                  size={24} 
+                  color="white" 
+                  style={isDrawing ? { transform: [{ rotate: '45deg' }] } : {}}
+                />
+                <Text className="text-center font-bold text-white text-lg">
+                  {isDrawing ? '占卜中...' : '开始占卜'}
+                </Text>
+              </View>
+            </LinearGradient>
           </Pressable>
         </View>
       </ScrollView>
 
-      {/* Random Hexagram Modal */}
       <HexagramModal visible={isVisible} hexagram={hexagram} onClose={closeHexagram} />
 
-      {/* Daily Lot Modal */}
       <DailyLotModal
         visible={dailyLotModalVisible}
         onClose={() => setDailyLotModalVisible(false)}

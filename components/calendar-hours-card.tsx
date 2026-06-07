@@ -1,6 +1,8 @@
 import { View, Text } from 'react-native';
 import { useColors } from '@/hooks/use-colors';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface CalendarHoursCardProps {
   lunarInfo: any;
@@ -23,217 +25,137 @@ export function CalendarHoursCard({ lunarInfo, hour, moonPhase }: CalendarHoursC
     '水': '#3B82F6',
   };
 
-  // Format dates
   const today = new Date();
-  const gregorianDate = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
-  const lunarDate = `${lunarInfo.lunarMonth}月${lunarInfo.lunarDay}日`;
-  const stemBranch = `${lunarInfo.stem}${lunarInfo.branch}`;
+  const gregorianDate = `${today.getMonth() + 1}/${today.getDate()}`;
+  const lunarDate = `${lunarInfo.lunarMonth}月${lunarInfo.lunarDay}`;
 
   return (
     <View
-      className="rounded-3xl p-6 gap-5 mx-4 mb-6"
+      className="rounded-3xl overflow-hidden mb-6"
       style={{
-        backgroundColor: colors.surface,
         shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 6,
       }}
     >
-      {/* Header Row - Date Info */}
-      <View className="gap-3">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1">
-            <Text className="text-xs text-muted mb-1">公历</Text>
-            <Text className="text-lg font-bold text-foreground">{gregorianDate}</Text>
-          </View>
-          <View className="flex-1">
-            <Text className="text-xs text-muted mb-1">农历</Text>
-            <Text className="text-lg font-bold text-foreground">{lunarDate}</Text>
-          </View>
-          <View className="flex-1">
-            <Text className="text-xs text-muted mb-1">生肖</Text>
-            <Text className="text-lg font-bold text-foreground">{lunarInfo.zodiac}</Text>
-          </View>
-        </View>
-
-        {/* Heavenly Stems and Earthly Branches */}
-        <View className="flex-row gap-3">
-          <View
-            className="flex-1 p-3 rounded-2xl"
-            style={{ backgroundColor: colors.primary + '15' }}
-          >
-            <Text className="text-xs text-muted mb-1">天干地支</Text>
-            <Text className="text-sm font-semibold text-foreground">{stemBranch}</Text>
-          </View>
-          <View
-            className="flex-1 p-3 rounded-2xl"
-            style={{ backgroundColor: colors.primary + '15' }}
-          >
-            <Text className="text-xs text-muted mb-1">五行</Text>
-            <Text className="text-sm font-semibold text-foreground">{lunarInfo.fiveElements}</Text>
-          </View>
-        </View>
-
-        {/* Moon Phase */}
-        {moonPhase && (
-          <View
-            className="p-4 rounded-2xl"
-            style={{ backgroundColor: colors.primary + '15' }}
-          >
-            <View className="flex-row items-center gap-2 mb-2">
-              <Text className="text-2xl">{moonPhase.emoji}</Text>
-              <View className="flex-1">
-                <Text className="text-sm font-semibold text-foreground">{moonPhase.name}</Text>
-                <Text className="text-xs text-muted">照亮度: {moonPhase.illumination}%</Text>
-              </View>
-            </View>
-            <Text className="text-xs text-foreground leading-relaxed mb-2">{moonPhase.description}</Text>
-            <View
-              className="p-2 rounded-lg"
-              style={{ backgroundColor: colors.primary + '25' }}
+      <LinearGradient
+        colors={[colors.surface, colors.surfaceElevated]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        className="p-5 gap-4"
+      >
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="flex-row items-center gap-3 flex-1">
+            <View 
+              className="w-12 h-12 rounded-2xl items-center justify-center"
+              style={{ backgroundColor: colors.primary + '20' }}
             >
-              <Text className="text-xs text-foreground">{moonPhase.influence}</Text>
+              <Text className="text-2xl">{lunarInfo.zodiac}</Text>
             </View>
+            <View className="flex-1 gap-0.5">
+              <View className="flex-row items-baseline gap-2">
+                <Text className="text-2xl font-bold" style={{ color: colors.foreground }}>
+                  {gregorianDate}
+                </Text>
+                <Text className="text-sm" style={{ color: colors.muted }}>公历</Text>
+              </View>
+              <Text className="text-xs" style={{ color: colors.foregroundSecondary }}>
+                农历{lunarDate} · {lunarInfo.stem}{lunarInfo.branch}
+              </Text>
+            </View>
+          </View>
+          
+          {moonPhase && (
+            <View 
+              className="w-10 h-10 rounded-full items-center justify-center"
+              style={{ backgroundColor: colors.backgroundSecondary }}
+            >
+              <Text className="text-xl">{moonPhase.emoji}</Text>
+            </View>
+          )}
+        </View>
+
+        <View className="flex-row gap-2">
+          <View className="flex-1 p-3 rounded-2xl" style={{ backgroundColor: colors.backgroundSecondary }}>
+            <View className="flex-row items-center gap-1.5 mb-1.5">
+              <MaterialCommunityIcons name="yin-yang" size={14} color={colors.primary} />
+              <Text className="text-xs font-semibold" style={{ color: colors.foreground }}>五行</Text>
+            </View>
+            <Text className="text-sm font-bold" style={{ color: colors.foreground }}>{lunarInfo.fiveElements}</Text>
+          </View>
+          <View className="flex-1 p-3 rounded-2xl" style={{ backgroundColor: colors.backgroundSecondary }}>
+            <View className="flex-row items-center gap-1.5 mb-1.5">
+              <MaterialIcons name="access-time" size={14} color={colors.primary} />
+              <Text className="text-xs font-semibold" style={{ color: colors.foreground }}>时辰</Text>
+            </View>
+            <Text className="text-sm font-bold" style={{ color: colors.foreground }}>{hour.hour}</Text>
+          </View>
+        </View>
+
+        {moonPhase && (
+          <View 
+            className="p-3 rounded-2xl"
+            style={{ backgroundColor: colors.primary + '10' }}
+          >
+            <Text className="text-xs font-medium mb-1" style={{ color: colors.foregroundSecondary }}>
+              月相：{moonPhase.name} ({moonPhase.illumination}%)
+            </Text>
+            <Text className="text-xs leading-relaxed" style={{ color: colors.foregroundSecondary }}>
+              {moonPhase.influence}
+            </Text>
           </View>
         )}
-      </View>
 
-      {/* Divider */}
-      <View style={{ height: 1, backgroundColor: colors.border }} />
-
-      {/* Current Hour Section */}
-      <View className="gap-3">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
-            <MaterialIcons name="schedule" size={18} color={colors.primary} />
-            <Text className="text-sm font-semibold text-foreground">当前时辰</Text>
+            <View 
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: elementColors[hour.element] || colors.primary }}
+            />
+            <Text className="text-sm font-bold" style={{ color: colors.foreground }}>{hour.element}时</Text>
           </View>
-          <View
-            className="px-3 py-1 rounded-full"
-            style={{ backgroundColor: elementColors[hour.element] || colors.primary }}
-          >
-            <Text className="text-xs font-bold text-white">{hour.element}</Text>
-          </View>
+          <Text className="text-xs" style={{ color: colors.muted }}>{hour.time}</Text>
         </View>
 
-        <View className="flex-row items-baseline gap-2">
-          <Text className="text-2xl font-bold text-foreground">{hour.hour}</Text>
-          <Text className="text-sm text-muted">{hour.time}</Text>
-          <Text className="text-xs text-muted ml-auto">对应器官: {hour.organ}</Text>
-        </View>
-
-        <Text className="text-sm text-foreground leading-relaxed">{hour.advice}</Text>
-      </View>
-
-      {/* Dos and Donts */}
-      <View className="gap-2">
-        <View className="flex-row gap-3">
-          {/* Dos */}
+        <View className="flex-row gap-4 pt-1">
           <View className="flex-1">
-            <View className="flex-row items-center gap-1 mb-2">
-              <View
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: colors.success }}
-              />
-              <Text className="text-xs font-semibold text-success">宜做</Text>
+            <View className="flex-row items-center gap-1.5 mb-2">
+              <MaterialIcons name="check-circle" size={14} color={colors.success} />
+              <Text className="text-xs font-semibold" style={{ color: colors.success }}>宜</Text>
             </View>
-            <View className="gap-1">
-              {hour.dos.slice(0, 2).map((item: string, index: number) => (
-                <Text key={index} className="text-xs text-foreground">
-                  • {item}
-                </Text>
+            <View className="flex-wrap flex-row gap-1.5">
+              {hour.dos.slice(0, 3).map((item: string, index: number) => (
+                <View
+                  key={index}
+                  className="px-2 py-1 rounded-lg"
+                  style={{ backgroundColor: colors.success + '15' }}
+                >
+                  <Text className="text-xs" style={{ color: colors.success }}>{item}</Text>
+                </View>
               ))}
             </View>
           </View>
-
-          {/* Donts */}
           <View className="flex-1">
-            <View className="flex-row items-center gap-1 mb-2">
-              <View
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: colors.error }}
-              />
-              <Text className="text-xs font-semibold text-error">忌做</Text>
+            <View className="flex-row items-center gap-1.5 mb-2">
+              <MaterialIcons name="cancel" size={14} color={colors.error} />
+              <Text className="text-xs font-semibold" style={{ color: colors.error }}>忌</Text>
             </View>
-            <View className="gap-1">
-              {hour.donts.slice(0, 2).map((item: string, index: number) => (
-                <Text key={index} className="text-xs text-foreground">
-                  • {item}
-                </Text>
+            <View className="flex-wrap flex-row gap-1.5">
+              {hour.donts.slice(0, 3).map((item: string, index: number) => (
+                <View
+                  key={index}
+                  className="px-2 py-1 rounded-lg"
+                  style={{ backgroundColor: colors.error + '15' }}
+                >
+                  <Text className="text-xs" style={{ color: colors.error }}>{item}</Text>
+                </View>
               ))}
             </View>
           </View>
         </View>
-      </View>
-
-      {/* Auspicious and Inauspicious Info */}
-      <View className="gap-2">
-        {/* Auspicious */}
-        <View
-          className="p-3 rounded-2xl"
-          style={{ backgroundColor: colors.success + '15' }}
-        >
-          <View className="flex-row items-center gap-1 mb-2">
-            <MaterialIcons name="check-circle" size={14} color={colors.success} />
-            <Text className="text-xs font-semibold text-success">今日宜</Text>
-          </View>
-          <View className="flex-row flex-wrap gap-1">
-            {lunarInfo.auspicious?.slice(0, 4).map((item: string, index: number) => (
-              <View
-                key={index}
-                className="px-2 py-1 rounded-full"
-                style={{ backgroundColor: colors.success + '25' }}
-              >
-                <Text className="text-xs text-success">{item}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Inauspicious */}
-        <View
-          className="p-3 rounded-2xl"
-          style={{ backgroundColor: colors.error + '15' }}
-        >
-          <View className="flex-row items-center gap-1 mb-2">
-            <MaterialIcons name="cancel" size={14} color={colors.error} />
-            <Text className="text-xs font-semibold text-error">今日忌</Text>
-          </View>
-          <View className="flex-row flex-wrap gap-1">
-            {lunarInfo.inauspicious?.slice(0, 4).map((item: string, index: number) => (
-              <View
-                key={index}
-                className="px-2 py-1 rounded-full"
-                style={{ backgroundColor: colors.error + '25' }}
-              >
-                <Text className="text-xs text-error">{item}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      </View>
-
-      {/* Food and Emotion Tips */}
-      <View className="gap-2 pt-2 border-t" style={{ borderTopColor: colors.border }}>
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-            <View className="flex-row items-center gap-1 mb-1">
-              <MaterialIcons name="restaurant" size={14} color={colors.warning} />
-              <Text className="text-xs font-semibold text-foreground">推荐食物</Text>
-            </View>
-            <Text className="text-xs text-foreground">{hour.food}</Text>
-          </View>
-          <View className="flex-1">
-            <View className="flex-row items-center gap-1 mb-1">
-              <MaterialIcons name="mood" size={14} color={colors.primary} />
-              <Text className="text-xs font-semibold text-foreground">情志调理</Text>
-            </View>
-            <Text className="text-xs text-foreground">{hour.emotion}</Text>
-          </View>
-        </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 }

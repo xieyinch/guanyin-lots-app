@@ -19,32 +19,32 @@ export function DivinationTabs({ activeTab, onTabChange }: DivinationTabsProps) 
   ];
 
   return (
-    <View className="flex-row gap-2 px-4 mb-6">
+    <View className="flex-row gap-2 px-2 mb-4">
       {tabs.map((tab) => (
         <Pressable
           key={tab.id}
           onPress={() => onTabChange(tab.id)}
-          style={({ pressed }) => [
-            {
-              flex: 1,
-              paddingVertical: 14,
-              paddingHorizontal: 8,
-              borderRadius: 12,
-              backgroundColor:
-                activeTab === tab.id ? colors.primary : colors.surface,
-              opacity: pressed ? 0.75 : 1,
-              borderWidth: activeTab === tab.id ? 0 : 1,
-              borderColor: colors.border,
-            },
-          ]}
+          className="flex-1 items-center"
+          style={({ pressed }) => ({
+            paddingVertical: 12,
+            paddingHorizontal: 6,
+            borderRadius: 16,
+            backgroundColor: activeTab === tab.id ? colors.primary : colors.surface,
+            opacity: pressed ? 0.85 : 1,
+            transform: pressed ? [{ scale: 0.95 }] : [],
+            shadowColor: activeTab === tab.id ? colors.primary : 'transparent',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: activeTab === tab.id ? 0.3 : 0,
+            shadowRadius: 4,
+            elevation: activeTab === tab.id ? 4 : 0,
+          })}
         >
-          <View className="items-center gap-2">
-            <Text className="text-2xl">{tab.icon}</Text>
+          <View className="items-center gap-1.5">
+            <Text className="text-xl">{tab.icon}</Text>
             <Text
-              className="text-xs font-semibold leading-tight"
+              className="text-xs font-bold tracking-wide"
               style={{
-                color:
-                  activeTab === tab.id ? 'white' : colors.foreground,
+                color: activeTab === tab.id ? 'white' : colors.foregroundSecondary,
               }}
             >
               {tab.label}

@@ -16,7 +16,7 @@ export interface ScreenContainerProps extends ViewProps {
   /**
    * Additional className for the outer container (background layer).
    */
-  containerClassName?: string;
+  containerClassName?: string | any;
   /**
    * Additional className for the SafeAreaView (content layer).
    */
@@ -28,15 +28,6 @@ export interface ScreenContainerProps extends ViewProps {
  *
  * The outer View extends to full screen (including status bar area) with the background color,
  * while the inner SafeAreaView ensures content is within safe bounds.
- *
- * Usage:
- * ```tsx
- * <ScreenContainer className="p-4">
- *   <Text className="text-2xl font-bold text-foreground">
- *     Welcome
- *   </Text>
- * </ScreenContainer>
- * ```
  */
 export function ScreenContainer({
   children,
@@ -52,8 +43,9 @@ export function ScreenContainer({
       className={cn(
         "flex-1",
         "bg-background",
-        containerClassName
+        typeof containerClassName === 'string' ? containerClassName : ''
       )}
+      style={typeof containerClassName !== 'string' ? containerClassName : undefined}
       {...props}
     >
       <SafeAreaView
