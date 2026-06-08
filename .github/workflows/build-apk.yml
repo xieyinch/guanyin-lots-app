@@ -6,8 +6,11 @@ on:
       - 'v*'
   workflow_dispatch:
 
+env:
+  EXPO_NO_GIT_ROOT: 1
+
 jobs:
-  build:
+  build-apk:
     name: Build APK
     runs-on: ubuntu-latest
     permissions:
@@ -31,57 +34,50 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Generate Android project
-        run: |
-          npx expo prebuild --platform android --clean
-        env:
-          EXPO_NO_GIT_ROOT: 1
+        run: npx expo prebuild --platform android --clean
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           api-level: 36
           build-tools-version: 36.0.0
-          cmdline-tools-version: 11.0
 
       - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
-          
+          ./gradlew assembleDebug --no-daemon
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug.apk
+          name: guanyin-lots-app-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+          retention-days: 14
 
-      - name: Create release notes
-        run: |
-          cat > release-notes.md << 'EOF'
-          ## 🎉 观音灵签 APK 发布
-          
-          ### 更新内容
-          EOF
-          git log -5 --pretty=format:"- %s" >> release-notes.md
-          echo "" >> release-notes.md
-          echo "" >> release-notes.md
-          echo "### 安装说明" >> release-notes.md
-          echo "1. 下载 APK 文件" >> release-notes.md
-          echo "2. 允许安装未知来源应用" >> release-notes.md
-          echo "3. 安装并打开应用" >> release-notes.md
-          echo "" >> release-notes.md
-          echo "**构建时间**: $(date '+%Y-%m-%d %H:%M')" >> release-notes.md
-
-      - name: Create Release
+      - name: Create Release (if tag)
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          body_path: release-notes.md
+          body: |
+            ## 🎉 观音灵签 APK 发布
+            
+            ### 版本信息
+            - 标签：${{ github.ref_name }}
+            - 提交：${{ github.sha }}
+            - 构建时间：$(date '+%Y-%m-%d %H:%M')
+            
+            ### 安装说明
+            1. 下载 APK 文件
+            2. 在 Android 设置中允许"安装未知来源应用"
+            3. 安装并打开应用
+            
+            ### 注意事项
+            - 这是 Debug 版本，体积较大
+            - 仅供测试使用
           files: android/app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: false
