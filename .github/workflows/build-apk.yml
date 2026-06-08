@@ -7,71 +7,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build:
     name: Build APK
     runs-on: ubuntu-22.04
     permissions:
       contents: write
     
     steps:
-      - name: Checkout code
+      - name: Check out Git repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Setup Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
+      - name: Install npm dependencies
+        run: npm install
 
-      - name: Prebuild Android
-        run: npx expo prebuild --platform android --clean
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 35
-          build-tools-version: 35.0.0
-          cmdline-version: 9.0
-
-      - name: Build APK
-        id: build_apk
-        working-directory: android
-        run: |
-          # Write local.properties with correct SDK path
-          echo "sdk.dir=/usr/local/lib/android/sdk" > local.properties
-          
-          # Build with gradle
-          chmod +x gradlew
-          ./gradlew clean assembleDebug --no-daemon
-          
-          # Find APK
-          APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
-          if [ -z "$APK_FILE" ]; then
-            echo "❌ APK not found!"
-            ls -la app/build/outputs/apk/debug/
-            exit 1
-          fi
-          
-          echo "✅ APK: $APK_FILE"
-          echo "apk_path=${APK_FILE}" >> $GITHUB_OUTPUT
+      - name: Build Android APK
+        run: npx expo run:android --configuration Debug --non-interactive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: guanyin-lots-app-debug.apk
-          path: ${{ steps.build_apk.outputs.apk_path }}
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/*.apk
           retention-days: 14
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ steps.build_apk.outputs.apk_path }}
+          files: android/app/build/outputs/apk/debug/*.apk
           draft: false
           prerelease: false
         env:
