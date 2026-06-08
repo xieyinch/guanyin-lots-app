@@ -6,9 +6,6 @@ on:
       - 'v*'
   workflow_dispatch:
 
-env:
-  EXPO_NO_GIT_ROOT: 1
-
 jobs:
   build-apk:
     name: Build APK
@@ -46,16 +43,18 @@ jobs:
           build-tools-version: 36.0.0
 
       - name: Build Debug APK
+        id: build_apk
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-
+          echo "apk_path=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)" >> $GITHUB_OUTPUT
+          
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: guanyin-lots-app-debug.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ steps.build_apk.outputs.apk_path }}
           retention-days: 14
 
       - name: Create Release (if tag)
@@ -78,7 +77,7 @@ jobs:
             ### 注意事项
             - 这是 Debug 版本，体积较大
             - 仅供测试使用
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: ${{ steps.build_apk.outputs.apk_path }}
           draft: false
           prerelease: false
         env:
