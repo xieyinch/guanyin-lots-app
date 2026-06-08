@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,7 +26,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install --legacy-peer-deps
+
+      - name: Prebuild Android project
+        run: |
+          npx expo prebuild --platform android --clean
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -36,27 +42,23 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 35
-          build-tools-version: 35.0.0
-          cmdline-version: 9.0
-          platform-tools-version: 35.0.0
-
-      - name: Prebuild Android
-        run: npx expo prebuild --platform android --clean
+          api-level: 34
+          build-tools-version: 34.0.0
 
       - name: Build Debug APK
         id: build_apk
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon
           APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
           if [ -z "$APK_FILE" ]; then
-            echo "APK file not found!"
+            echo "ERROR: APK not found!"
             ls -la app/build/outputs/apk/debug/
             exit 1
           fi
           echo "apk_path=${APK_FILE}" >> $GITHUB_OUTPUT
+          echo "✓ Built APK: ${APK_FILE}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
