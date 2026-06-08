@@ -22,16 +22,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Setup Java
+      - name: Setup Java (Temurin 17)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
 
       - name: Generate Android project
         run: npx expo prebuild --platform android --clean
@@ -39,16 +40,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 36
-          build-tools-version: 36.0.0
+          api-level: 34
+          build-tools-version: 34.0.0
 
       - name: Build Debug APK
         id: build_apk
+        working-directory: android
         run: |
-          cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-          echo "apk_path=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)" >> $GITHUB_OUTPUT
+          APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
+          echo "apk_path=${APK_FILE}" >> $GITHUB_OUTPUT
           
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -61,22 +63,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          body: |
-            ## 🎉 观音灵签 APK 发布
-            
-            ### 版本信息
-            - 标签：${{ github.ref_name }}
-            - 提交：${{ github.sha }}
-            - 构建时间：$(date '+%Y-%m-%d %H:%M')
-            
-            ### 安装说明
-            1. 下载 APK 文件
-            2. 在 Android 设置中允许"安装未知来源应用"
-            3. 安装并打开应用
-            
-            ### 注意事项
-            - 这是 Debug 版本，体积较大
-            - 仅供测试使用
           files: ${{ steps.build_apk.outputs.apk_path }}
           draft: false
           prerelease: false
