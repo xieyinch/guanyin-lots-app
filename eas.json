@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 15.0.0"
+    "version": ">= 15.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -8,20 +9,15 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": "assembleDebug"
+        "image": "latest"
       }
     },
     "preview": {
-      "distribution": "internal",
+      "distribution": "internal", 
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest"
       }
-    },
-    "production": {
-      "distribution": "store"
     }
-  },
-  "submit": {
-    "production": {}
   }
 }

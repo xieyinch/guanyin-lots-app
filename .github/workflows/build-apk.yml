@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK with EAS
 
 on:
   push:
@@ -11,39 +11,36 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
       
-      - name: Install
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      
+      - name: Install dependencies
         run: npm install
       
-      - name: Prebuild
-        run: npx expo prebuild --platform android --clean
-      
-      - name: Build with Gradle
-        working-directory: android
+      - name: Build with EAS
         run: |
-          export ANDROID_HOME=/usr/local/lib/android/sdk
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          eas build --platform android --profile preview --non-interactive --output-file guanyin-lots.apk
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: guanyin-lots-debug.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: guanyin-lots.apk
+          path: guanyin-lots.apk
       
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: guanyin-lots.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
