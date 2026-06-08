@@ -6,6 +6,7 @@
   "icon": "./assets/images/icon.png",
   "userInterfaceStyle": "automatic",
   "newArchEnabled": true,
+  "scheme": "guanyin-lots",
   "ios": {
     "supportsTablet": true,
     "bundleIdentifier": "space.manus.guanyin"
@@ -26,15 +27,20 @@
     "favicon": "./assets/images/favicon.png"
   },
   "plugins": [
-    "expo-router",
-    "expo-asset",
+    [
+      "expo-router",
+      {
+        "root": "app",
+        "scheme": "guanyin-lots"
+      }
+    ],
     [
       "expo-splash-screen",
       {
+        "backgroundColor": "#ffffff",
         "image": "./assets/images/splash-icon.png",
         "imageWidth": 200,
-        "resizeMode": "contain",
-        "backgroundColor": "#ffffff"
+        "resizeMode": "contain"
       }
     ],
     [
@@ -49,10 +55,5 @@
   ],
   "experiments": {
     "typedRoutes": true
-  },
-  "extra": {
-    "eas": {
-      "projectId": "guanyin-lots-app"
-    }
   }
 }
