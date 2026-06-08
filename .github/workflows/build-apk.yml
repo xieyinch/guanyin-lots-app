@@ -10,36 +10,37 @@ jobs:
   build-apk:
     name: Build APK
     runs-on: ubuntu-22.04
-    container:
-      image: reactnativecommunity/react-native-android:latest
+    container: 
+      image: react-native-community/react-native-android:latest
+      options: -v /root/.gradle:/root/.gradle
     permissions:
       contents: write
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
+      - uses: actions/checkout@v4
+      
+      - name: Install deps
         run: npm install
-
-      - name: Build Debug APK
-        id: build_apk
+      
+      - name: Prebuild
+        run: npx expo prebuild --platform android --clean
+      
+      - name: Build APK
         working-directory: android
         run: |
-          ./gradlew clean assembleDebug
-          APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
-          echo "apk_path=$APK_FILE" >> $GITHUB_OUTPUT
-
+          echo "sdk.dir=/opt/android-sdk" > local.properties
+          ./gradlew assembleDebug
+      
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: guanyin-app.apk
-          path: ${{ steps.build_apk.outputs.apk_path }}
-
+          name: guanyin-lots.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+      
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ steps.build_apk.outputs.apk_path }}
+          files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
