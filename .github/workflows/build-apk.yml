@@ -32,63 +32,58 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g eas-cli
           npm ci
 
-      - name: Create android directory
+      - name: Generate Android project
         run: |
-          mkdir -p android
-
-      - name: Build APK with EAS
-        run: |
-          eas build --platform android --profile preview --non-interactive --no-wait
+          npx expo prebuild --platform android --clean
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        continue-on-error: true
+          EXPO_NO_GIT_ROOT: 1
 
-      - name: Export static web app
-        run: npx expo export --platform web --output-dir dist
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 36
+          build-tools-version: 36.0.0
+          cmdline-tools-version: 11.0
 
-      - name: Upload web build artifact
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-build
-          path: dist/
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
       - name: Create release notes
         run: |
-          echo "## 观音灵签 APK 构建" > release-notes.md
-          echo "" >> release-notes.md
-          echo "**构建时间**: $(date '+%Y-%m-%d %H:%M:%S')" >> release-notes.md
-          echo "**版本**: ${GITHUB_REF#refs/tags/}" >> release-notes.md
-          echo "**提交**: ${GITHUB_SHA}" >> release-notes.md
-          echo "" >> release-notes.md
-          echo "### 更新内容" >> release-notes.md
+          cat > release-notes.md << 'EOF'
+          ## 🎉 观音灵签 APK 发布
+          
+          ### 更新内容
+          EOF
           git log -5 --pretty=format:"- %s" >> release-notes.md
           echo "" >> release-notes.md
           echo "" >> release-notes.md
-          echo "### 使用说明" >> release-notes.md
-          echo "1. 下载最新的 APK 文件" >> release-notes.md
-          echo "2. 在 Android 设备上安装" >> release-notes.md
-          echo "3. 打开应用体验观音灵签" >> release-notes.md
+          echo "### 安装说明" >> release-notes.md
+          echo "1. 下载 APK 文件" >> release-notes.md
+          echo "2. 允许安装未知来源应用" >> release-notes.md
+          echo "3. 安装并打开应用" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "**构建时间**: $(date '+%Y-%m-%d %H:%M')" >> release-notes.md
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           body_path: release-notes.md
-          files: |
-            *.apk
+          files: android/app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload APK to release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: '*.apk'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
