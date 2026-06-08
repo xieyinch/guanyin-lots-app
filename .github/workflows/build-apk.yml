@@ -1,4 +1,4 @@
-name: Build Android APK with EAS
+name: Build Android APK
 
 on:
   push:
@@ -7,34 +7,47 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
-    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+          node-version: 20
+          cache: npm
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       
-      - name: Build with EAS
+      - name: Prebuild
+        run: npx expo prebuild --platform android --clean
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        id: setup-android
+        with:
+          api-level: 36
+          build-tools-version: 36.0.0
+      
+      - name: Build APK
+        id: build
+        working-directory: android
         run: |
-          eas build --platform android --profile preview --non-interactive --output-file guanyin-lots.apk
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          echo "sdk.dir=${{ steps.setup-android.outputs.sdk-path }}" > local.properties
+          cat local.properties
+          ./gradlew assembleDebug
+          ls -la app/build/outputs/apk/debug/
+          cp app/build/outputs/apk/debug/app-debug.apk ../guanyin-lots.apk
       
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: guanyin-lots.apk
+          name: guanyin-lots-debug.apk
           path: guanyin-lots.apk
       
       - name: Release
