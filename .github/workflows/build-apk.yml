@@ -25,13 +25,15 @@ jobs:
       - run: npx expo prebuild --platform android --clean
       
       - name: Build APK
+        id: build
         working-directory: android
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          which gradlew || ls -la gradlew
           ./gradlew assembleDebug --no-daemon 2>&1 | tee /tmp/build.log
-          ls -la app/build/outputs/apk/debug/ || true
+          APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
+          echo "apk_path=$APK" >> $GITHUB_OUTPUT
+          echo "Built: $APK"
       
       - uses: actions/upload-artifact@v4
         if: always()
@@ -40,13 +42,14 @@ jobs:
           path: /tmp/build.log
       
       - uses: actions/upload-artifact@v4
+        if: steps.build.outputs.apk_path != ''
         with:
           name: guanyin-lots.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ steps.build.outputs.apk_path }}
       
       - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && steps.build.outputs.apk_path != ''
         with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: ${{ steps.build.outputs.apk_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
