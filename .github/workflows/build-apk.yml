@@ -25,30 +25,22 @@ jobs:
       - run: npx expo prebuild --platform android --clean
       
       - name: Build APK
-        id: build
         working-directory: android
         run: |
           ./gradlew assembleDebug --no-daemon
-          echo "Looking for APK..."
-          find app/build -name "*.apk"
-          APK_PATH=$(find app/build -name "*.apk" | head -1)
-          if [ -n "$APK_PATH" ]; then
-            echo "Found APK: $APK_PATH"
-            cp "$APK_PATH" /tmp/app-debug.apk
-            echo "apk_path=/tmp/app-debug.apk" >> $GITHUB_OUTPUT
-          else
-            echo "APK not found!"
-            exit 1
-          fi
+          ls -la app/build/outputs/apk/debug/
       
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: guanyin-lots.apk
-          path: /tmp/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
       
       - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: always() && startsWith(github.ref, 'refs/tags/')
         with:
-          files: /tmp/app-debug.apk
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
