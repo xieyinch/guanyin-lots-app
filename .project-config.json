@@ -1,0 +1,47 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://3M24AAQdhSteGBn.b02ef1c70362:M4qXP8c6vbp5R1d2TlcF@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/72WNYCmFLvDDdNLXrx4FvJ?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": [
+    "no_db_push"
+  ],
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310419663028415106/72WNYCmFLvDDdNLXrx4FvJ",
+    "access_key_id": "ASIAZV3A2ECZP3NO2XUU",
+    "secret_access_key": "n+oPhenpM/T6438YzPcYpgJWH3htShByL17F7qly",
+    "session_token": "IQoJb3JpZ2luX2VjEAAaCXVzLWVhc3QtMSJGMEQCIEJlipAPoaRONbIEjkPhLNPKOtltfuqPfd3KElPxte9dAiAhd/A8MLskso79ClJSuFJdZveoeLB6xgC61Q7uLNb65Sr/AwjI//////////8BEAQaDDY2NTM4NjA5ODg2NiIMoz8LG38PoQO74naFKtMDX135/7b8wEo/vu8wXBJKeMDElv2tHbOiiCTmi9Kia3czsenxRD/IFllN1yV7uUlx9k32fKiPxsfHnpfwy7wIYnXTkhcRCArIro3PyDHzFJ2gnl3leyOzQN4Z+AG3XgWTbzY7lSFHnm8CBFC7GU6tCSpaEQx/dEYj1xsWonJNyEDBMLXo/XuzO/C39IJcSs1Y7CrCWVsC2sLw3Q/nSvobsSsfeXUNms4bLtGkOamo5VXA4XnCcSUlAVW4KF5S0PTANLs0QdhvqUbseHwuSLz3H+huYkLeIJZca1FoUnlSD1Jfaz9la6X8MTpoG9q73aOW+g6QzphxON+g15LIACyrVeK6fWSY95B3X84FAPu4mdpy3CYeha9V0yurlD8oTilPAB/zU7l5t3RFnFBiatx7sGVs0eY45TJjgc/2MVDlVYCmfHauQRWDfvHLSf1XC9jk6dQbAEtCSHmElOmJJF/LqdtG/cSSmIxH9nrYFiFcAmqUHaPDz7QXt2MxG000bV7W3YSLrCCNHGe/4SOB4mqICWw5M/C13iAt8mf72zkDath6Txhe5UwBoUBPBdnPJtSjVWZ6vp1H/4Q2xCrh21l5wkxBFGRbzzBTuspMp5bim+CRLAMwjfue0QY6ngGIvNnKULkwHfkIkUxTZzbqn4Tv9JHak+tC5O5qJxoVnQAWAziYTM52q1C4daGI3MfD/IZ4qEEYn3HG2yt9GjO2Z/H057BJd4jusRMhuRbkhsrdjHxHhy/Ef79B+QPA1YOtue996LT7CzH0T/T/y7d584WHBO8EJsw/+x45MfippIRaYM+6HTrRvYHrZYVW2+8f7U0UqKiFEqaCoXj/Qw==",
+    "expiration": "2026-06-09T19:15:25.000Z"
+  },
+  "name": "guanyin-lots-app",
+  "path": "/home/ubuntu/guanyin-lots-app",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "ku5sg5UBKZe8PifhxPTSE2",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "EXPO_APP_QR_URL": "exps://8081-i74akmlup79g6celngr6o-c5035bab.us2.manus.computer",
+    "EXPO_PACKAGER_PROXY_URL": "https://8081-i74akmlup79g6celngr6o-c5035bab.us2.manus.computer",
+    "EXPO_PUBLIC_API_BASE_URL": "https://3000-i74akmlup79g6celngr6o-c5035bab.us2.manus.computer",
+    "JWT_SECRET": "2JK5wybM8iXURbHP58erAh",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "yinchao xie",
+    "OWNER_OPEN_ID": "W2upmnhbUzN4MS7buhTCcJ",
+    "REACT_NATIVE_PACKAGER_HOSTNAME": "8081-i74akmlup79g6celngr6o-c5035bab.us2.manus.computer",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "b5a5f158-7bb0-4520-91bb-e7bb0c90586f",
+    "VITE_APP_ID": "72WNYCmFLvDDdNLXrx4FvJ",
+    "VITE_APP_LOGO": "https://d2xsxph8kpxj0f.cloudfront.net/310419663028415106/72WNYCmFLvDDdNLXrx4FvJ/icon-Re3bDgV55pYCG2R2e4DWdz.webp",
+    "VITE_APP_TITLE": "观音灵签",
+    "VITE_FRONTEND_FORGE_API_KEY": "FZg6AFMz9cTpc2vNoominA",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "app",
+  "test_command": "pnpm test"
+}
