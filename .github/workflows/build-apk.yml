@@ -7,51 +7,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-22.04
+    container: imgbot/android:latest
     permissions:
       contents: write
-    env:
-      ANDROID_HOME: /root/android-sdk
-      ANDROID_SDK_ROOT: /root/android-sdk
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      
-      - name: Install Android SDK
-        run: |
-          mkdir -p $ANDROID_HOME
-          cd /tmp
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools $ANDROID_HOME/cmdline-tools
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci
       
       - name: Prebuild
         run: npx expo prebuild --platform android --clean
       
-      - name: Build APK
+      - name: Build
         working-directory: android
-        run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin
-          ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug
       
-      - name: Upload APK
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: guanyin-lots-debug.apk
+          name: app-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
       
       - name: Release
