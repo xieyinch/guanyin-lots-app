@@ -63,7 +63,11 @@ Thumbs.db
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+<<<<<<< Updated upstream
 android/build/
 android/.gradle/
 android/app/build/
 android/local.properties
+=======
+.project-config.json
+>>>>>>> Stashed changes

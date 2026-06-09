@@ -15,6 +15,7 @@ import { useRandomHexagram } from '@/hooks/use-random-hexagram';
 import { HexagramModal } from '@/components/hexagram-modal';
 import { DailyLotModal } from '@/components/daily-lot-modal';
 import { useMoonPhase } from '@/hooks/use-moon-phase';
+import { DrawAnimation } from '@/components/draw-animation';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import * as Haptics from 'expo-haptics';
@@ -634,6 +635,7 @@ export default function HomeScreen() {
   );
 
   return (
+<<<<<<< Updated upstream
     <ScreenContainer className="p-0" containerClassName={{ backgroundColor: colors.background }}>
       <ScrollView 
         showsVerticalScrollIndicator={false} 
@@ -652,6 +654,17 @@ export default function HomeScreen() {
                 )}
               </View>
               <Text className="text-sm" style={{ color: colors.muted }}>选择占卜方式</Text>
+=======
+    <ScreenContainer className="p-0">
+      <DrawAnimation isDrawing={isDrawing} type={activeTab} />
+      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+        <View className="px-4 pt-6 pb-4 gap-5">
+          {/* Header with Title and Daily Lot Icon */}
+          <View className="flex-row justify-between items-start gap-2 mb-2">
+            <View className="flex-1 gap-2">
+              <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
+              <Text className="text-sm text-muted">选择占卜方式</Text>
+>>>>>>> Stashed changes
             </View>
             <Pressable
               onPress={() => setDailyLotModalVisible(true)}

@@ -1,7 +1,12 @@
 import { View, Text, Pressable, Animated } from 'react-native';
 import { useColors } from '@/hooks/use-colors';
+<<<<<<< Updated upstream
 import { Ionicons } from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+=======
+import { useEffect, useRef } from 'react';
+import * as Haptics from 'expo-haptics';
+>>>>>>> Stashed changes
 
 export type DivinationType = 'lots' | 'coin' | 'bagua' | 'tarot';
 
@@ -12,6 +17,7 @@ interface DivinationTabsProps {
 
 export function DivinationTabs({ activeTab, onTabChange }: DivinationTabsProps) {
   const colors = useColors();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const tabs: { 
     id: DivinationType; 
@@ -45,7 +51,24 @@ export function DivinationTabs({ activeTab, onTabChange }: DivinationTabsProps) 
     },
   ];
 
+  // Animate tab change
+  useEffect(() => {
+    scaleAnim.setValue(0.95);
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 12,
+      bounciness: 8,
+    }).start();
+  }, [activeTab, scaleAnim]);
+
+  const handleTabPress = (tab: DivinationType) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onTabChange(tab);
+  };
+
   return (
+<<<<<<< Updated upstream
     <View className="flex-row gap-2 px-2 mb-4 py-1">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
@@ -89,10 +112,45 @@ export function DivinationTabs({ activeTab, onTabChange }: DivinationTabsProps) 
                 className="text-xs font-bold tracking-wide"
                 style={{
                   color: isActive ? 'white' : colors.foregroundSecondary,
+=======
+    <View className="flex-row gap-3 px-4 mb-6">
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        return (
+          <Pressable
+            key={tab.id}
+            onPress={() => handleTabPress(tab.id)}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                paddingVertical: 16,
+                paddingHorizontal: 12,
+                borderRadius: 14,
+                backgroundColor: isActive ? colors.primary : colors.surface,
+                opacity: pressed ? 0.85 : 1,
+                transform: isActive ? [{ scale: scaleAnim }] : [],
+                borderWidth: isActive ? 0 : 1.5,
+                borderColor: colors.border,
+                shadowColor: isActive ? colors.primary : 'transparent',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: isActive ? 0.2 : 0,
+                shadowRadius: 4,
+                elevation: isActive ? 3 : 0,
+              },
+            ]}
+          >
+            <View className="items-center gap-1.5">
+              <Text className="text-3xl">{tab.icon}</Text>
+              <Text
+                className="text-xs font-semibold leading-tight"
+                style={{
+                  color: isActive ? 'white' : colors.foreground,
+>>>>>>> Stashed changes
                 }}
               >
                 {tab.label}
               </Text>
+<<<<<<< Updated upstream
               {isActive && (
                 <View className="flex-row items-center gap-0.5">
                   <View className="w-1 h-1 rounded-full bg-white" />
@@ -100,6 +158,8 @@ export function DivinationTabs({ activeTab, onTabChange }: DivinationTabsProps) 
                   <View className="w-1 h-1 rounded-full bg-white opacity-60" />
                 </View>
               )}
+=======
+>>>>>>> Stashed changes
             </View>
           </Pressable>
         );
