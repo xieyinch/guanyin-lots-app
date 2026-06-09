@@ -28,28 +28,27 @@ jobs:
         id: build
         working-directory: android
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          ./gradlew assembleDebug --no-daemon 2>&1 | tee /tmp/build.log
-          APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
-          echo "apk_path=$APK" >> $GITHUB_OUTPUT
-          echo "Built: $APK"
+          ./gradlew assembleDebug --no-daemon
+          echo "Looking for APK..."
+          find app/build -name "*.apk"
+          APK_PATH=$(find app/build -name "*.apk" | head -1)
+          if [ -n "$APK_PATH" ]; then
+            echo "Found APK: $APK_PATH"
+            cp "$APK_PATH" /tmp/app-debug.apk
+            echo "apk_path=/tmp/app-debug.apk" >> $GITHUB_OUTPUT
+          else
+            echo "APK not found!"
+            exit 1
+          fi
       
       - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build-logs
-          path: /tmp/build.log
-      
-      - uses: actions/upload-artifact@v4
-        if: steps.build.outputs.apk_path != ''
         with:
           name: guanyin-lots.apk
-          path: ${{ steps.build.outputs.apk_path }}
+          path: /tmp/app-debug.apk
       
       - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && steps.build.outputs.apk_path != ''
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ steps.build.outputs.apk_path }}
+          files: /tmp/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
