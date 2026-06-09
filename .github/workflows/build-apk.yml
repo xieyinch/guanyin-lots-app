@@ -27,8 +27,17 @@ jobs:
       - name: Build APK
         working-directory: android
         run: |
-          # Use ANDROID_HOME from GitHub-hosted runner
-          ./gradlew assembleDebug --no-daemon
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          which gradlew || ls -la gradlew
+          ./gradlew assembleDebug --no-daemon 2>&1 | tee /tmp/build.log
+          ls -la app/build/outputs/apk/debug/ || true
+      
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs
+          path: /tmp/build.log
       
       - uses: actions/upload-artifact@v4
         with:
