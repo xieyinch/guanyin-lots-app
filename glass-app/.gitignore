@@ -1,0 +1,12 @@
+node_modules/
+android/
+ios/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.tsbuildinfo
+
+# native signing
+*.jks
+*.keystore
