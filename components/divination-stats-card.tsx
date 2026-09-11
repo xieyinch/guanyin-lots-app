@@ -24,12 +24,14 @@ export function DivinationStatsCard({
   ];
 
   return (
-    <View className="mx-4 mb-6 rounded-2xl p-6 gap-4" style={{ backgroundColor: colors.surface }}>
+    <View className="mx-4 mb-6 rounded-2xl p-6 gap-4" style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border + '33' }}>
       {/* Header */}
       <View className="gap-2">
         <Text className="text-lg font-bold text-foreground">占卜统计</Text>
-        <Text className="text-3xl font-bold text-primary">{totalCount}</Text>
-        <Text className="text-xs text-muted">总占卜次数</Text>
+        <View className="flex-row items-baseline gap-2 mt-1">
+          <Text className="text-4xl font-bold text-primary">{totalCount}</Text>
+          <Text className="text-xs text-muted">总占卜次数</Text>
+        </View>
       </View>
 
       {/* Time Range Selector */}
