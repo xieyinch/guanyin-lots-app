@@ -179,8 +179,19 @@ export default function HomeScreen() {
             )}
           </>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮抽签</Text>
+          <View className="flex-1 items-center justify-center py-16 gap-3">
+            <View
+              className="w-20 h-20 rounded-full items-center justify-center"
+              style={{
+                backgroundColor: colors.surface,
+                borderWidth: 1.5,
+                borderColor: colors.primary + '55',
+              }}
+            >
+              <MaterialIcons name="auto-awesome" size={36} color={colors.primary} />
+            </View>
+            <Text className="text-base font-semibold text-foreground">还未抽签</Text>
+            <Text className="text-sm text-muted text-center">点击下方按钮，抽取一支灵签</Text>
           </View>
         )}
       </View>
@@ -290,8 +301,19 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮占卜</Text>
+          <View className="flex-1 items-center justify-center py-16 gap-3">
+            <View
+              className="w-20 h-20 rounded-full items-center justify-center"
+              style={{
+                backgroundColor: colors.surface,
+                borderWidth: 1.5,
+                borderColor: colors.primary + '55',
+              }}
+            >
+              <MaterialIcons name="blur-circular" size={36} color={colors.primary} />
+            </View>
+            <Text className="text-base font-semibold text-foreground">还未起卦</Text>
+            <Text className="text-sm text-muted text-center">点击下方按钮，起一卦以观天机</Text>
           </View>
         )}
       </View>
@@ -360,8 +382,19 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-muted text-center">点击下方按钮抽牌</Text>
+          <View className="flex-1 items-center justify-center py-16 gap-3">
+            <View
+              className="w-20 h-20 rounded-full items-center justify-center"
+              style={{
+                backgroundColor: colors.surface,
+                borderWidth: 1.5,
+                borderColor: colors.primary + '55',
+              }}
+            >
+              <MaterialIcons name="style" size={36} color={colors.primary} />
+            </View>
+            <Text className="text-base font-semibold text-foreground">还未抽牌</Text>
+            <Text className="text-sm text-muted text-center">点击下方按钮，抽取一张塔罗牌</Text>
           </View>
         )}
       </View>
@@ -375,18 +408,36 @@ export default function HomeScreen() {
           {/* Header with Title and Daily Lot Icon */}
           <View className="flex-row justify-between items-start gap-2 mb-2">
             <View className="flex-1 gap-2">
-              <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
-              <Text className="text-sm text-muted">选择占卜方式</Text>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-4xl font-bold text-foreground">观音灵签</Text>
+              </View>
+              <View className="flex-row items-center gap-2 mt-1">
+                <View
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: colors.primary }}
+                />
+                <Text className="text-sm text-muted">心诚则灵 · 选一卜众</Text>
+              </View>
             </View>
             {/* Daily Lot Icon Button */}
             <Pressable
               onPress={() => setDailyLotModalVisible(true)}
-              style={({ pressed }) => [{
-                opacity: pressed ? 0.6 : 1,
-              }]}
+              style={({ pressed }) => [
+                {
+                  opacity: pressed ? 0.6 : 1,
+                  transform: [{ scale: pressed ? 0.95 : 1 }],
+                },
+              ]}
             >
-              <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.surface }}>
-                <MaterialIcons name="calendar-today" size={20} color={colors.primary} />
+              <View
+                className="w-12 h-12 rounded-2xl items-center justify-center"
+                style={{
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.primary + '55',
+                }}
+              >
+                <MaterialIcons name="calendar-today" size={22} color={colors.primary} />
               </View>
             </Pressable>
           </View>
@@ -414,21 +465,29 @@ export default function HomeScreen() {
             style={({ pressed }) => [
               {
                 backgroundColor: colors.primary,
-                paddingVertical: 16,
+                paddingVertical: 18,
                 paddingHorizontal: 16,
-                borderRadius: 12,
+                borderRadius: 16,
                 opacity: pressed || isDrawing ? 0.85 : 1,
+                transform: [{ scale: pressed ? 0.97 : 1 }],
                 shadowColor: colors.primary,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 5,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.4,
+                shadowRadius: 12,
+                elevation: 6,
               },
             ]}
           >
-            <Text className="text-center font-bold text-white text-lg">
-              {isDrawing ? '占卜中...' : '开始占卜'}
-            </Text>
+            <View className="flex-row items-center justify-center gap-2">
+              <MaterialIcons
+                name={isDrawing ? 'autorenew' : 'auto-awesome'}
+                size={20}
+                color="white"
+              />
+              <Text className="text-center font-bold text-white text-lg">
+                {isDrawing ? '占卜中...' : '开始占卜'}
+              </Text>
+            </View>
           </Pressable>
         </View>
       </ScrollView>

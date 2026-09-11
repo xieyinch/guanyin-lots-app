@@ -137,25 +137,40 @@ export default function HistoryScreen() {
 
     return (
       <View
-        className="mx-4 my-2 p-4 rounded-lg flex-row items-center justify-between"
-        style={{ backgroundColor: colors.surface }}
+        className="mx-4 my-2 p-4 rounded-2xl flex-row items-center justify-between"
+        style={{
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.border + '33',
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+          elevation: 1,
+        }}
       >
         <View className="flex-row items-center gap-3 flex-1">
-          <Text className="text-2xl">{getTypeIcon(item.type)}</Text>
+          <View
+            className="w-11 h-11 rounded-2xl items-center justify-center"
+            style={{ backgroundColor: colors.primary + '15' }}
+          >
+            <Text className="text-xl">{getTypeIcon(item.type)}</Text>
+          </View>
           <View className="flex-1">
             <View className="flex-row items-center gap-2">
-              <Text className="text-xs font-semibold text-muted">
+              <Text className="text-xs font-semibold text-primary">
                 {getTypeLabel(item.type)}
               </Text>
+              <Text className="text-xs text-muted">·</Text>
+              <Text className="text-xs text-muted">
+                {formatTime(item.timestamp)}
+              </Text>
             </View>
-            <Text className="text-base font-semibold text-foreground">
+            <Text className="text-base font-semibold text-foreground mt-0.5">
               {title}
             </Text>
-            <Text className="text-xs text-muted mt-1">
+            <Text className="text-xs text-muted mt-0.5" numberOfLines={1}>
               {subtitle}
-            </Text>
-            <Text className="text-xs text-muted mt-1">
-              {formatTime(item.timestamp)}
             </Text>
           </View>
         </View>
@@ -166,13 +181,22 @@ export default function HistoryScreen() {
   if (allHistory.length === 0) {
     return (
       <ScreenContainer className="items-center justify-center">
-        <View className="items-center gap-4">
-          <MaterialIcons name="history" size={48} color={colors.muted} />
+        <View className="items-center gap-4 px-8">
+          <View
+            className="w-24 h-24 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: colors.surface,
+              borderWidth: 1.5,
+              borderColor: colors.primary + '55',
+            }}
+          >
+            <MaterialIcons name="history" size={48} color={colors.primary} />
+          </View>
           <Text className="text-lg font-semibold text-foreground">
             暂无占卜历史
           </Text>
-          <Text className="text-sm text-muted text-center">
-            开始占卜后，历史记录将显示在这里
+          <Text className="text-sm text-muted text-center leading-relaxed">
+            每次占卜的灵签、硬币与八卦结果都会保存在这里，方便随时回看。
           </Text>
         </View>
       </ScreenContainer>
@@ -188,7 +212,7 @@ export default function HistoryScreen() {
             <Text className="text-3xl font-bold text-foreground">
               占卜历史
             </Text>
-            <Text className="text-sm text-muted">
+            <Text className="text-sm text-muted mt-1">
               共 {allHistory.length} 条记录
             </Text>
           </View>
@@ -197,10 +221,13 @@ export default function HistoryScreen() {
             style={({ pressed }) => [
               {
                 opacity: pressed ? 0.7 : 1,
+                backgroundColor: colors.error + '15',
+                padding: 10,
+                borderRadius: 12,
               },
             ]}
           >
-            <MaterialIcons name="delete-outline" size={24} color={colors.error} />
+            <MaterialIcons name="delete-outline" size={22} color={colors.error} />
           </Pressable>
         </View>
 
