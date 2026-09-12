@@ -15,21 +15,22 @@ export function GlassScreen({
   const tint = theme.primary;
 
   return (
-    <LinearGradient
-      colors={
-        theme.scheme === "dark"
-          ? [theme.background, `${theme.primary}22`, theme.background]
-          : [theme.backgroundElevated, theme.background]
-      }
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.flex}
-    >
-      <View style={[styles.flex, { backgroundColor: tint + "00" }]} />
+    <View style={styles.flex}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={
+          theme.scheme === "dark"
+            ? [theme.background, `${tint}22`, theme.background]
+            : [theme.backgroundElevated, theme.background]
+        }
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <SafeAreaView edges={["top", "left", "right"]} style={styles.flex}>
         <View style={[styles.content, style]}>{children}</View>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
